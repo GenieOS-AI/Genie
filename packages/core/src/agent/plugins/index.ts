@@ -1,3 +1,4 @@
+import { z } from 'zod';
 export { BasePlugin } from './BasePlugin';
 
 /**
@@ -9,9 +10,9 @@ export interface ToolExample {
 }
 
 /**
- * Interface for tool metadata including name, description and examples
+ * Interface for tool configuration including name, description, schema and examples
  */
-export interface ToolMetadata extends Record<string, unknown> {
+export interface ToolConfig extends Record<string, unknown> {
   name: string;
   description: string;
   examples: ToolExample[];
