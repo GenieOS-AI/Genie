@@ -1,0 +1,19 @@
+{
+  "name": "@genie/plugin-example",
+  "version": "1.0.0",
+  "description": "Example plugins for Genie, including a weather plugin",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@genie/core": "workspace:*",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+  "typescript": "^5.7.3",
+  "@types/node": "^20.17.12"
+  }
+} 

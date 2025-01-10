@@ -1,6 +1,7 @@
 import { Tool } from '@langchain/core/tools';
 import { Agent } from '../../types/agent';
-import { ToolMetadata } from '../index';
+import { ToolConfig } from '../index';
+import { z } from 'zod';
 
 /**
  * Base tool class that extends LangChain's Tool with agent and callback support
@@ -8,7 +9,7 @@ import { ToolMetadata } from '../index';
 export abstract class BaseTool<T extends Record<string, unknown>> extends Tool {
   protected agent: Agent;
   protected callback?: (toolName: string, input: T, output: string) => void;
-  public readonly metadata: ToolMetadata;
+  public readonly config: ToolConfig;
 
   name: string;
   description: string;
@@ -16,31 +17,31 @@ export abstract class BaseTool<T extends Record<string, unknown>> extends Tool {
   /**
    * Creates a new tool instance
    * @param agent The agent instance this tool is attached to
-   * @param metadata The tool's metadata including name, description, and examples
+   * @param config The tool's configuration including name, description, schema and examples
    * @param callback Optional callback function that receives tool name, input and output
    */
   constructor(
     agent: Agent,
-    metadata: ToolMetadata,
+    config: ToolConfig,
     callback?: (toolName: string, input: T, output: string) => void
   ) {
     super();
     this.agent = agent;
-    this.metadata = metadata;
+    this.config = config;
     this.callback = callback;
-    this.name = metadata.name;
-    this.description = metadata.description + "\n\n" + this.formatExampleMessages();
+    this.name = config.name;
+    this.description = config.description + "\n\n" + this.formatExampleMessages();
   }
 
   /**
    * Format example messages as a conversation
    */
   protected formatExampleMessages(): string {
-    if (!this.metadata.examples.length) {
+    if (!this.config.examples.length) {
       return "";
     }
 
-    return this.metadata.examples
+    return this.config.examples
       .map((example, index) => {
         const params = JSON.stringify(example.tool.params, null, 2);
         return `Example ${index + 1}:
@@ -53,7 +54,13 @@ Assistant: Use the ${this.name} tool with the following parameters: ${params}`;
   /**
    * Validate input against schema
    */
-  protected abstract validateInput(input: unknown): T;
+  protected validateInput(input: unknown): T {
+    const parsed = this.schema.parse(input);
+    if (!parsed) {
+      throw new Error('Tool input validation failed: parsed result is undefined');
+    }
+    return parsed as unknown as T;
+  }
 
   /**
    * Override the _call method to include callback handling
