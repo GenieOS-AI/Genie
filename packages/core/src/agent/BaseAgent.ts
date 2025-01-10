@@ -8,6 +8,7 @@ import { Tool } from '@langchain/core/tools';
 import { BufferMemory } from 'langchain/memory';
 import { SystemMessage, HumanMessage } from '@langchain/core/messages';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
+import { env } from '../environment';
 
 export class BaseAgent implements Agent {
   public readonly id: string;
@@ -27,22 +28,32 @@ export class BaseAgent implements Agent {
   async initialize(): Promise<void> {
     const modelConfig = getModelConfig(this.config.provider);
     
-    if (!modelConfig.apiKey) {
-      throw new Error(`API key not configured for provider ${this.config.provider}`);
+    let apiKey: string | undefined;
+    if (modelConfig.apiKeyEnvVarName) {
+      apiKey = env.get(modelConfig.apiKeyEnvVarName);
+      if (!apiKey) {
+        throw new Error(`API key not found in environment for provider ${this.config.provider} (${modelConfig.apiKeyEnvVarName})`);
+      }
     }
 
     // Initialize the language model based on provider
     switch (this.config.provider) {
       case ModelProvider.OPENAI:
         this.context.model = new ChatOpenAI({
-          openAIApiKey: modelConfig.apiKey,
+          ...(apiKey && { openAIApiKey: apiKey }),
           modelName: this.config.model,
           temperature: this.config.temperature,
           maxTokens: this.config.maxTokens,
         });
         break;
       default:
-        throw new Error(`Unsupported provider: ${this.config.provider}`);
+        this.context.model = new ChatOpenAI({
+          ...(apiKey && { openAIApiKey: apiKey }),
+          modelName: this.config.model,
+          temperature: this.config.temperature,
+          maxTokens: this.config.maxTokens,
+        });
+        break;
     }
 
     // Initialize agent executor with memory

@@ -15,8 +15,8 @@ export interface ModelSettings {
 
 export interface ModelConfig {
     endpoint?: string;
-    apiKey?: string;
     settings?: ModelSettings;
+    apiKeyEnvVarName?: string;
   }
   
   export type ModelConfigurations = {
