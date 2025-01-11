@@ -7,7 +7,7 @@ import { getModelConfig } from './config';
 import { Tool } from '@langchain/core/tools';
 import { BufferMemory } from 'langchain/memory';
 import { SystemMessage, HumanMessage } from '@langchain/core/messages';
-import { ChatPromptTemplate } from '@langchain/core/prompts';
+import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
 import { env } from '../environment';
 
 export class BaseAgent implements Agent {
@@ -31,8 +31,9 @@ export class BaseAgent implements Agent {
     if (this.config.plugins) {
       await Promise.all(
         this.config.plugins.map(async plugin => {
-          if (plugin.initialize) {
-            await plugin.initialize();
+          await plugin.initialize(this);
+          if (!plugin.existAgent()) {
+            throw new Error('Agent not found after plugin initialization');
           }
           // Add tools after plugin is initialized
           if (plugin.tools) {
@@ -86,7 +87,7 @@ export class BaseAgent implements Agent {
     const prompt = this.config.chatTemplate ?? ChatPromptTemplate.fromMessages([
       systemMessage,
       ["human", "{input}"],
-      ["assistant", "I'll help you with that. Let me use my tools effectively to assist you."]
+      new MessagesPlaceholder("agent_scratchpad")
     ]);
 
     const agent = await createOpenAIToolsAgent({

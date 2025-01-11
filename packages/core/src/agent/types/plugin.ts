@@ -1,4 +1,5 @@
 import { Tool } from '@langchain/core/tools';
+import { Agent } from './agent';
 
 /**
  * Metadata information for a plugin
@@ -23,6 +24,25 @@ export interface PluginOptions {
 }
 
 /**
+ * Plugin callback data structure
+ */
+export interface PluginCallbackData {
+  /** Tool-specific data if the callback is from a tool */
+  tool?: {
+    name: string;
+    input: Record<string, unknown>;
+    output: string;
+  };
+  /** Any additional data */
+  [key: string]: unknown;
+}
+
+/**
+ * Plugin callback function type
+ */
+export type PluginCallback = (pluginName: string, data: PluginCallbackData) => void;
+
+/**
  * Core plugin interface that all plugins must implement
  */
 export interface Plugin {
@@ -31,7 +51,11 @@ export interface Plugin {
   /** List of tools provided by this plugin */
   tools: Tool[];
   /** Initialize the plugin and its tools */
-  initialize?(): Promise<void>;
+  initialize(agent: Agent): Promise<void>;
+  /** Check if the plugin has an agent */
+  existAgent(): boolean;
+  /** Set the plugin callback */
+  setCallback(callback: PluginCallback): void;
   /** Clean up any resources used by the plugin */
   cleanup?(): Promise<void>;
 } 

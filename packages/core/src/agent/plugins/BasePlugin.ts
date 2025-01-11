@@ -1,10 +1,8 @@
-import { Plugin, PluginMetadata, PluginOptions } from '../types/plugin';
+import { Plugin, PluginMetadata, PluginOptions, PluginCallback, PluginCallbackData } from '../types/plugin';
 import { Agent } from '../types/agent';
 import { BaseTool } from './tools/BaseTool';
 
 type ToolClass = new (agent: Agent, callback?: (toolName: string, input: Record<string, unknown>, output: string) => void) => BaseTool<any>;
-
-type PluginCallback = (pluginName: string, toolName: string, input: Record<string, unknown>, output: string) => void;
 
 /**
  * Base plugin class that implements the Plugin interface
@@ -14,46 +12,45 @@ export abstract class BasePlugin implements Plugin {
   public readonly metadata: PluginMetadata;
   protected options: PluginOptions;
   protected _tools: BaseTool<any>[] = [];
-  protected agent: Agent;
+  protected agent!: Agent;
   protected callback?: PluginCallback;
-  private initPromise: Promise<void>;
+  private toolClasses: ToolClass[] = [];
 
   /**
    * Creates a new plugin instance
-   * @param agent The agent instance this plugin is attached to
    * @param metadata Plugin metadata
    * @param tools Array of tool classes to instantiate
-   * @param callback Optional callback function for tool execution
    * @param options Plugin-specific configuration options
    */
   constructor(
-    agent: Agent, 
     metadata: PluginMetadata, 
     tools: ToolClass[] = [],
-    callback?: PluginCallback,
     options: PluginOptions = {}
   ) {
-    this.agent = agent;
     this.metadata = metadata;
-    this.callback = callback;
     this.options = options;
-    this._tools = tools.map(Tool => new Tool(agent, this.handleToolCallback.bind(this)));
-    this.initPromise = this.initialize();
+    this.toolClasses = tools;
   }
 
   /**
-   * Initialize the plugin
-   * Override this method to add async initialization logic
+   * Initialize the plugin with an agent instance
+   * Must be called before using any plugin functionality
    */
-  public async initialize(): Promise<void> {
-    // Override this method to add initialization logic
+  public existAgent(): boolean {
+    return !!this.agent;
+  }
+
+  public async initialize(agent: Agent): Promise<void> {
+    this.agent = agent;
+    // Initialize tools after agent is set
+    this._tools = this.toolClasses.map(Tool => new Tool(agent, this.handleToolCallback.bind(this)));
   }
 
   /**
-   * Wait for plugin initialization to complete
+   * Set the plugin callback
    */
-  public async ready(): Promise<void> {
-    await this.initPromise;
+  public setCallback(callback: PluginCallback): void {
+    this.callback = callback;
   }
 
   /**
@@ -67,6 +64,15 @@ export abstract class BasePlugin implements Plugin {
    * Handle tool execution callback
    */
   protected handleToolCallback(toolName: string, input: Record<string, unknown>, output: string): void {
-    this.callback?.(this.metadata.name, toolName, input, output);
+    if (this.callback) {
+      const data: PluginCallbackData = {
+        tool: {
+          name: toolName,
+          input,
+          output
+        }
+      };
+      this.callback(this.metadata.name, data);
+    }
   }
 } 

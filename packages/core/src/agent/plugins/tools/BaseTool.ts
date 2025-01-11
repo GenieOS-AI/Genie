@@ -67,6 +67,7 @@ Assistant: Use the ${this.name} tool with the following parameters: ${params}`;
    * @param input The input to the tool
    */
   protected async _call(input: string): Promise<string> {
+    console.log('Input to _call:', input);
     const parsed = JSON.parse(input);
     const validatedInput = this.validateInput(parsed);
     const output = await this.execute(validatedInput);
