@@ -23,9 +23,25 @@ export class BaseAgent implements Agent {
     this.id = uuidv4();
     this.config = config;
     this.dependencies = dependencies;
+    this.context.tools = [];
   }
 
   async initialize(): Promise<void> {
+    // Initialize plugins first if they have initialization logic
+    if (this.config.plugins) {
+      await Promise.all(
+        this.config.plugins.map(async plugin => {
+          if (plugin.initialize) {
+            await plugin.initialize();
+          }
+          // Add tools after plugin is initialized
+          if (plugin.tools) {
+            this.context.tools.push(...plugin.tools);
+          }
+        })
+      );
+    }
+
     const modelConfig = getModelConfig(this.config.provider);
     
     let apiKey: string | undefined;

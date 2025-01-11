@@ -5,6 +5,7 @@ import { NetworkManager } from '../../network/NetworkManager';
 import { AgentExecutor } from 'langchain/agents';
 import { Tool } from '@langchain/core/tools';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
+import { Plugin } from './plugin';
 
 export interface AgentConfig {
   provider: ModelProvider;
@@ -13,6 +14,7 @@ export interface AgentConfig {
   maxTokens?: number;
   verbose?: boolean;
   chatTemplate?: ChatPromptTemplate;
+  plugins?: Plugin[];
 }
 
 export interface AgentDependencies {
