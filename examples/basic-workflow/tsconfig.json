@@ -1,16 +1,13 @@
 {
-    "compilerOptions": {
-      "target": "es2018",
-      "module": "commonjs",
-      "lib": ["es2018", "dom"],
-      "declaration": true,
-      "outDir": "./dist",
-      "rootDir": "./src",
-      "strict": true,
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "forceConsistentCasingInFileNames": true
-    },
-    "include": ["src"],
-    "exclude": ["node_modules", "dist"]
-  } 
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "references": [
+    { "path": "../../packages/core" },
+    { "path": "../../packages/plugins/wallet" },
+    { "path": "../../packages/plugins/example" }
+  ],
+  "include": ["src/**/*"]
+} 

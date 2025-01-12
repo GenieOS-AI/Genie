@@ -9,7 +9,6 @@ const weatherInputSchema = z.object({
 });
 
 export class GetWeatherTool extends BaseTool<WeatherInput> {
-  schema = weatherInputSchema;
 
   constructor(agent: Agent, callback?: (toolName: string, input: WeatherInput, output: string) => void) {
     super(
@@ -17,6 +16,7 @@ export class GetWeatherTool extends BaseTool<WeatherInput> {
       {
         name: 'get_weather',
         description: 'Get the current weather for a specific city',
+        schema: weatherInputSchema as any,
         examples: [
           {
             user: 'What is the weather like in London?',
@@ -33,8 +33,8 @@ export class GetWeatherTool extends BaseTool<WeatherInput> {
     );
   }
 
-  validateInput(input: WeatherInput): boolean {
-    return true;
+  validateInput(input: WeatherInput): { status: boolean; errors?: string[] } {
+    return { status: true };
   }
 
   protected async execute(input: WeatherInput): Promise<string> {

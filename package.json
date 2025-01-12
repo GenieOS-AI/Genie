@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "build": "pnpm --filter @genie/core build && pnpm --filter @genie/plugin-example build"
+    "build": "pnpm --filter @genie/core build && pnpm --filter @genie/wallet-plugin build"
   },
   "dependencies": {
   },
