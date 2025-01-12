@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "build": "pnpm -r --filter=!@genie/plugin-example build",
+    "build": "pnpm -r --filter=!@genie/plugin-example --filter=!./examples/* build",
     "test": "pnpm -r --filter=@genie/core test",
     "test:watch": "pnpm -r --filter=@genie/core test:watch"
   },

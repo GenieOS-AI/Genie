@@ -1,6 +1,7 @@
 import { BasePlugin, Agent, PluginMetadata } from '@genie/core';
 import { WeatherPluginOptions } from './types';
 import { GetWeatherTool } from './tools/GetWeatherTool';
+import packageJson from '../package.json';
 
 export class WeatherPlugin extends BasePlugin {
   protected readonly options: WeatherPluginOptions;
@@ -9,7 +10,7 @@ export class WeatherPlugin extends BasePlugin {
     const metadata: PluginMetadata = {
       name: 'weather',
       description: 'A plugin for getting weather information',
-      version: '1.0.0',
+      version: packageJson.version,
     };
     super(metadata, [GetWeatherTool], options);
     this.options = options;
