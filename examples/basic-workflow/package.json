@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@genie/core": "workspace:*",
-    "@genie/plugin-example": "workspace:*"
+    "@genie/plugins-example": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.0.0",

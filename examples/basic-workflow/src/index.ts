@@ -1,5 +1,5 @@
 import { AgentFactory, env, ModelProvider, NetworkManager, Wallet } from '@genie/core';
-import { WeatherPlugin } from '@genie/plugin-example';
+import { WeatherPlugin } from '@genie/plugins-example';
 
 async function main() {
   // Setup dependencies
@@ -37,6 +37,7 @@ async function main() {
     provider: ModelProvider.OPENAI,
     model: process.env.OPENAI_MODEL || 'gpt-4-turbo-preview',
     plugins: [new WeatherPlugin()],
+    verbose: true
   }, dependencies);
 
   // Initialize the assistant agent
