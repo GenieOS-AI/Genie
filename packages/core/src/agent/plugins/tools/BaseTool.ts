@@ -2,16 +2,18 @@ import { Tool } from '@langchain/core/tools';
 import { Agent } from '../../types/agent';
 import { ToolConfig } from '../index';
 import { StructuredTool } from '@langchain/core/tools';
+import { z } from 'zod';
 /**
  * Base tool class that extends LangChain's Tool with agent and callback support
  */
 export abstract class BaseTool<T extends Record<string, unknown>> extends StructuredTool {
   protected agent: Agent;
   protected callback?: (toolName: string, input: T, output: string) => void;
-  public readonly config: ToolConfig;
+  public readonly config: ToolConfig<T>;
 
   name: string;
   description: string;
+  schema: any;
 
   /**
    * Creates a new tool instance
@@ -21,7 +23,7 @@ export abstract class BaseTool<T extends Record<string, unknown>> extends Struct
    */
   constructor(
     agent: Agent,
-    config: ToolConfig,
+    config: ToolConfig<T>,
     callback?: (toolName: string, input: T, output: string) => void
   ) {
     super();
@@ -30,6 +32,7 @@ export abstract class BaseTool<T extends Record<string, unknown>> extends Struct
     this.callback = callback;
     this.name = config.name;
     this.description = config.description + "\n\n" + this.formatExampleMessages();
+    this.schema = config.schema;
   }
 
   /**
@@ -52,8 +55,9 @@ Assistant: Use the ${this.name} tool with the following parameters: ${params}`;
 
   /**
    * Validate input against schema
+   * @returns Validation result with status and optional error messages
    */
-  abstract validateInput(input: T): boolean;
+  abstract validateInput(input: T): { status: boolean; errors?: string[] };
 
   /**
    * Override the _call method to include callback handling
@@ -61,9 +65,12 @@ Assistant: Use the ${this.name} tool with the following parameters: ${params}`;
    */
   protected async _call(input: T): Promise<string> {
     console.log('Input to _call:', input);
-    const validatedInput = this.validateInput(input);
-    if (!validatedInput) {
-      throw new Error('Tool input validation failed');
+    const validation = this.validateInput(input);
+    if (!validation.status) {
+      return JSON.stringify({ 
+        success: false, 
+        errors: validation.errors || ['Unknown validation error'] 
+      });
     }
     const output = await this.execute(input);
     this.callback?.(this.name, input, output);
