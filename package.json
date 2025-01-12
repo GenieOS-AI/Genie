@@ -2,7 +2,8 @@
   "name": "genie",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "examples/*"
   ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
