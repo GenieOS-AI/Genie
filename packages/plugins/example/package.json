@@ -1,5 +1,5 @@
 {
-  "name": "@genie/plugins-example",
+  "name": "@genie/plugin-example",
   "version": "1.0.0",
   "description": "Example plugins for Genie, including a weather plugin",
   "main": "dist/index.js",

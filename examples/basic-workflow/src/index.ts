@@ -1,5 +1,5 @@
 import { AgentFactory, env, ModelProvider, NetworkManager, Wallet } from '@genie/core';
-import { WeatherPlugin } from '@genie/plugins-example';
+import { WeatherPlugin } from '@genie/plugin-example';
 
 async function main() {
   // Setup dependencies
