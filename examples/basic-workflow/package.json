@@ -5,11 +5,13 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "wallet": "ts-node src/wallet-example.ts"
   },
   "dependencies": {
     "@genie/core": "workspace:*",
-    "@genie/plugin-example": "workspace:*"
+    "@genie/example-plugin": "workspace:*",
+    "@genie/wallet-plugin": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.0.0",
