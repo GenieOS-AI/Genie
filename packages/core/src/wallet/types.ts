@@ -1,5 +1,6 @@
 import { Transaction as EVMTransaction } from 'ethers';
 import { Transaction as SolanaTransaction, VersionedTransaction } from '@solana/web3.js';
+import { NetworkName } from '../network/types';
 
 export interface WalletConfig {
   seedPhrase: string;
@@ -23,23 +24,23 @@ export type ChainWalletInfo = EVMWalletInfo | SolanaWalletInfo;
 
 export interface SignMessageParams {
   message: string;
-  network: string;
+  network: NetworkName;
 }
 
 export interface EVMSignTransactionParams {
   transaction: EVMTransaction;
-  network: string;
+  network: NetworkName;
 }
 
 export interface SolanaSignTransactionParams {
   transaction: SolanaTransaction | VersionedTransaction;
-  network: string;
+  network: NetworkName;
 }
 
 export type SignTransactionParams = EVMSignTransactionParams | SolanaSignTransactionParams;
 
 export interface WalletInterface {
-  getAddress(network: string): Promise<string>;
+  getAddress(network: NetworkName): Promise<string>;
   signMessage(params: SignMessageParams): Promise<string>;
   signTransaction(params: SignTransactionParams): Promise<string>;
 } 

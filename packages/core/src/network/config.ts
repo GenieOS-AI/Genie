@@ -1,13 +1,13 @@
-import { NetworksConfig } from './types';
+import { NetworksConfig, NetworkName } from './types';
 
 export const defaultNetworksConfig: NetworksConfig = {
-  defaultNetwork: 'ethereum-mainnet',
+  defaultNetwork: NetworkName.ETHEREUM,
   networks: {
-    'ethereum-mainnet': {
+    [NetworkName.ETHEREUM]: {
       type: 'evm',
       config: {
         chainId: 1,
-        name: 'Ethereum Mainnet',
+        name: 'Ethereum',
         rpcUrl: 'https://eth-mainnet.g.alchemy.com/v2/your-api-key',
         explorerUrl: 'https://etherscan.io',
         nativeCurrency: {
@@ -17,25 +17,11 @@ export const defaultNetworksConfig: NetworksConfig = {
         },
       },
     },
-    'ethereum-goerli': {
-      type: 'evm',
-      config: {
-        chainId: 5,
-        name: 'Goerli Testnet',
-        rpcUrl: 'https://eth-goerli.g.alchemy.com/v2/your-api-key',
-        explorerUrl: 'https://goerli.etherscan.io',
-        nativeCurrency: {
-          name: 'Goerli Ether',
-          symbol: 'ETH',
-          decimals: 18,
-        },
-      },
-    },
-    'polygon-mainnet': {
+    [NetworkName.POLYGON]: {
       type: 'evm',
       config: {
         chainId: 137,
-        name: 'Polygon Mainnet',
+        name: 'Polygon',
         rpcUrl: 'https://polygon-mainnet.g.alchemy.com/v2/your-api-key',
         explorerUrl: 'https://polygonscan.com',
         nativeCurrency: {
@@ -45,22 +31,13 @@ export const defaultNetworksConfig: NetworksConfig = {
         },
       },
     },
-    'solana-mainnet': {
+    [NetworkName.SOLANA]: {
       type: 'solana',
       config: {
-        name: 'Solana Mainnet',
+        name: 'Solana',
         rpcUrl: 'https://api.mainnet-beta.solana.com',
         explorerUrl: 'https://explorer.solana.com',
         wsEndpoint: 'wss://api.mainnet-beta.solana.com',
-      },
-    },
-    'solana-devnet': {
-      type: 'solana',
-      config: {
-        name: 'Solana Devnet',
-        rpcUrl: 'https://api.devnet.solana.com',
-        explorerUrl: 'https://explorer.solana.com/?cluster=devnet',
-        wsEndpoint: 'wss://api.devnet.solana.com',
       },
     },
   },

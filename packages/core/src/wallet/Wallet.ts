@@ -3,7 +3,7 @@ import { Keypair, Transaction as SolanaTransaction, VersionedTransaction } from 
 import { mnemonicToSeedSync } from 'bip39';
 import { derivePath } from 'ed25519-hd-key';
 import { NetworkManager } from '../network/NetworkManager';
-import { NetworkType } from '../network/types';
+import { NetworkType, NetworkName } from '../network/types';
 import {
   WalletConfig,
   WalletInterface,
@@ -34,12 +34,12 @@ export class Wallet implements WalletInterface {
     this.#solanaKeypair = Keypair.fromSeed(keyPair.key);
   }
 
-  private getNetworkType(network: string): NetworkType {
+  private getNetworkType(network: NetworkName): NetworkType {
     const networkConfig = this.#networkManager.getNetworkConfig(network);
     return networkConfig.type;
   }
 
-  public async getAddress(network: string): Promise<string> {
+  public async getAddress(network: NetworkName): Promise<string> {
     const networkType = this.getNetworkType(network);
     
     if (networkType === 'evm') {

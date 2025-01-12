@@ -1,11 +1,11 @@
 import { ethers } from 'ethers';
 import { Connection } from '@solana/web3.js';
-import { NetworksConfig, NetworkConfig, EVMNetworkConfig, SolanaNetworkConfig } from './types';
+import { NetworksConfig, NetworkConfig, EVMNetworkConfig, SolanaNetworkConfig, NetworkName } from './types';
 
 export class NetworkManager {
   #networks: NetworksConfig;
-  #evmProviders: Map<string, ethers.JsonRpcProvider>;
-  #solanaConnections: Map<string, Connection>;
+  #evmProviders: Map<NetworkName, ethers.JsonRpcProvider>;
+  #solanaConnections: Map<NetworkName, Connection>;
 
   constructor(config: NetworksConfig) {
     this.#networks = config;
@@ -16,11 +16,11 @@ export class NetworkManager {
 
   #initializeNetworks() {
     Object.entries(this.#networks.networks).forEach(([networkName, networkConfig]) => {
-      this.#initializeNetwork(networkName, networkConfig);
+      this.#initializeNetwork(networkName as NetworkName, networkConfig);
     });
   }
 
-  #initializeNetwork(networkName: string, networkConfig: NetworkConfig) {
+  #initializeNetwork(networkName: NetworkName, networkConfig: NetworkConfig) {
     if (networkConfig.type === 'evm') {
       const evmConfig = networkConfig.config as EVMNetworkConfig;
       const provider = new ethers.JsonRpcProvider(evmConfig.rpcUrl);
@@ -32,7 +32,15 @@ export class NetworkManager {
     }
   }
 
-  public getProvider(networkName: string): ethers.JsonRpcProvider | Connection {
+  public isNetworkSupported(networkName: NetworkName): boolean {
+    return networkName in this.#networks.networks;
+  }
+
+  public getSupportedNetworks(): NetworkName[] {
+    return Object.keys(this.#networks.networks) as NetworkName[];
+  }
+
+  public getProvider(networkName: NetworkName): ethers.JsonRpcProvider | Connection {
     const network = this.#networks.networks[networkName];
     if (!network) {
       throw new Error(`Network ${networkName} not found`);
@@ -53,7 +61,7 @@ export class NetworkManager {
     }
   }
 
-  public getNetworkConfig(networkName: string): NetworkConfig {
+  public getNetworkConfig(networkName: NetworkName): NetworkConfig {
     const config = this.#networks.networks[networkName];
     if (!config) {
       throw new Error(`Network ${networkName} not found`);

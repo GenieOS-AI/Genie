@@ -1,12 +1,12 @@
-import { AgentFactory, env, ModelProvider, NetworkManager, Wallet } from '@genie/core';
+import { AgentFactory, env, ModelProvider, NetworkManager, Wallet, NetworkName } from '@genie/core';
 import { WeatherPlugin } from '@genie/plugin-example';
 
 async function main() {
   // Setup dependencies
   const network = new NetworkManager({
-    defaultNetwork: 'ethereum',
+    defaultNetwork: NetworkName.ETHEREUM,
     networks: {
-      ethereum: {
+      [NetworkName.ETHEREUM]: {
         type: 'evm',
         config: {
           chainId: 1,
@@ -37,7 +37,6 @@ async function main() {
     provider: ModelProvider.OPENAI,
     model: process.env.OPENAI_MODEL || 'gpt-4-turbo-preview',
     plugins: [new WeatherPlugin()],
-    verbose: true
   }, dependencies);
 
   // Initialize the assistant agent
