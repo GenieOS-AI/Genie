@@ -1,5 +1,5 @@
-import { Tool } from '@langchain/core/tools';
 import { Agent } from './agent';
+import { BaseTool } from '../plugins/tools/BaseTool';
 
 /**
  * Metadata information for a plugin
@@ -49,7 +49,7 @@ export interface Plugin {
   /** Plugin metadata */
   metadata: PluginMetadata;
   /** List of tools provided by this plugin */
-  tools: Tool[];
+  tools: BaseTool<any>[];
   /** Initialize the plugin and its tools */
   initialize(agent: Agent): Promise<void>;
   /** Check if the plugin has an agent */

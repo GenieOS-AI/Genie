@@ -9,7 +9,7 @@ const weatherInputSchema = z.object({
 });
 
 export class GetWeatherTool extends BaseTool<WeatherInput> {
-  static schema = weatherInputSchema;
+  schema = weatherInputSchema;
 
   constructor(agent: Agent, callback?: (toolName: string, input: WeatherInput, output: string) => void) {
     super(
@@ -33,6 +33,10 @@ export class GetWeatherTool extends BaseTool<WeatherInput> {
     );
   }
 
+  validateInput(input: WeatherInput): boolean {
+    return true;
+  }
+
   protected async execute(input: WeatherInput): Promise<string> {
     // This is a mock implementation. In a real plugin, you would call a weather API
     const mockWeather = {
@@ -41,6 +45,12 @@ export class GetWeatherTool extends BaseTool<WeatherInput> {
       humidity: 65,
       windSpeed: 12
     };
+
+    console.log('Executing GetWeatherTool with output:', JSON.stringify({
+      city: input.city,
+      country: input.country,
+      weather: mockWeather
+    }));
 
     return JSON.stringify({
       city: input.city,

@@ -1,12 +1,11 @@
 import { Tool } from '@langchain/core/tools';
 import { Agent } from '../../types/agent';
 import { ToolConfig } from '../index';
-import { z } from 'zod';
-
+import { StructuredTool } from '@langchain/core/tools';
 /**
  * Base tool class that extends LangChain's Tool with agent and callback support
  */
-export abstract class BaseTool<T extends Record<string, unknown>> extends Tool {
+export abstract class BaseTool<T extends Record<string, unknown>> extends StructuredTool {
   protected agent: Agent;
   protected callback?: (toolName: string, input: T, output: string) => void;
   public readonly config: ToolConfig;
@@ -54,24 +53,20 @@ Assistant: Use the ${this.name} tool with the following parameters: ${params}`;
   /**
    * Validate input against schema
    */
-  protected validateInput(input: unknown): T {
-    const parsed = this.schema.parse(input);
-    if (!parsed) {
-      throw new Error('Tool input validation failed: parsed result is undefined');
-    }
-    return parsed as unknown as T;
-  }
+  abstract validateInput(input: T): boolean;
 
   /**
    * Override the _call method to include callback handling
    * @param input The input to the tool
    */
-  protected async _call(input: string): Promise<string> {
+  protected async _call(input: T): Promise<string> {
     console.log('Input to _call:', input);
-    const parsed = JSON.parse(input);
-    const validatedInput = this.validateInput(parsed);
-    const output = await this.execute(validatedInput);
-    this.callback?.(this.name, validatedInput, output);
+    const validatedInput = this.validateInput(input);
+    if (!validatedInput) {
+      throw new Error('Tool input validation failed');
+    }
+    const output = await this.execute(input);
+    this.callback?.(this.name, input, output);
     return output;
   }
 

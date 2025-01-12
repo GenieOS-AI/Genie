@@ -3,9 +3,9 @@ import { ChatOpenAI } from '@langchain/openai';
 import { Wallet } from '../../wallet/Wallet';
 import { NetworkManager } from '../../network/NetworkManager';
 import { AgentExecutor } from 'langchain/agents';
-import { Tool } from '@langchain/core/tools';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { Plugin } from './plugin';
+import { BaseTool } from '../plugins/tools/BaseTool';
 
 export interface AgentConfig {
   provider: ModelProvider;
@@ -28,7 +28,7 @@ export interface AgentOptions extends AgentConfig {
 
 export interface AgentContext {
   model: ChatOpenAI;
-  tools: Tool[];
+  tools: BaseTool<any>[];
   executor?: AgentExecutor;
   memory?: any;
 }
@@ -40,6 +40,6 @@ export interface Agent {
   context: AgentContext;
   initialize(): Promise<void>;
   execute(input: string): Promise<string>;
-  addTool(tool: Tool): void;
+  addTool(tool: BaseTool<any>): void;
   removeTool(toolName: string): void;
 } 

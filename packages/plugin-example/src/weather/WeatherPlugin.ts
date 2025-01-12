@@ -1,31 +1,22 @@
-import { BasePlugin, Agent } from '@genie/core';
+import { BasePlugin, Agent, PluginMetadata } from '@genie/core';
 import { WeatherPluginOptions } from './types';
 import { GetWeatherTool } from './tools/GetWeatherTool';
 
 export class WeatherPlugin extends BasePlugin {
   protected readonly options: WeatherPluginOptions;
 
-  constructor(
-    agent: Agent,
-    callback?: (pluginName: string, toolName: string, input: Record<string, unknown>, output: string) => void,
-    options: WeatherPluginOptions = {}
-  ) {
-    super(
-      agent,
-      {
-        name: 'weather',
-        description: 'A plugin for getting weather information',
-        version: '1.0.0',
-      },
-      [GetWeatherTool],
-      callback,
-      options
-    );
+  constructor(options: WeatherPluginOptions = {}) {
+    const metadata: PluginMetadata = {
+      name: 'weather',
+      description: 'A plugin for getting weather information',
+      version: '1.0.0',
+    };
+    super(metadata, [GetWeatherTool], options);
     this.options = options;
   }
 
-  public async initialize(): Promise<void> {
-    // Here you would typically initialize any API clients or validate API keys
+  public async initialize(agent: Agent): Promise<void> {
+    super.initialize(agent);
     if (this.options.apiKey) {
       // Initialize weather API client
     }

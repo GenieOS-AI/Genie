@@ -4,11 +4,10 @@ import { AgentExecutor, createOpenAIToolsAgent } from 'langchain/agents';
 import { Agent, AgentConfig, AgentContext, AgentDependencies } from './types/agent';
 import { ModelProvider } from './types/model';
 import { getModelConfig } from './config';
-import { Tool } from '@langchain/core/tools';
-import { BufferMemory } from 'langchain/memory';
-import { SystemMessage, HumanMessage } from '@langchain/core/messages';
+import { SystemMessage } from '@langchain/core/messages';
 import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
 import { env } from '../environment';
+import { BaseTool } from './plugins/tools/BaseTool';
 
 export class BaseAgent implements Agent {
   public readonly id: string;
@@ -73,12 +72,6 @@ export class BaseAgent implements Agent {
         break;
     }
 
-    // Initialize agent executor with memory
-    const memory = new BufferMemory({
-      returnMessages: true,
-      memoryKey: "chat_history",
-    });
-
     const systemMessage = new SystemMessage(
       "You are a helpful AI assistant that can use tools to accomplish tasks. " +
       "Always use tools when available and appropriate for the task."
@@ -92,14 +85,13 @@ export class BaseAgent implements Agent {
 
     const agent = await createOpenAIToolsAgent({
       llm: this.context.model,
-      tools: this.context.tools,
+      tools: this.context.tools as any[],
       prompt: prompt,
     });
 
     this.context.executor = new AgentExecutor({
       agent,
-      tools: this.context.tools,
-      memory,
+      tools: this.context.tools as any[],
       verbose: this.config.verbose,
     });
   }
@@ -116,7 +108,7 @@ export class BaseAgent implements Agent {
     return result.output;
   }
 
-  addTool(tool: Tool): void {
+  addTool(tool: BaseTool<any>): void {
     this.context.tools.push(tool);
     // Reinitialize agent if it was already initialized to include new tool
     if (this.context.executor) {
