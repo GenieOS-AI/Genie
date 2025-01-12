@@ -3,11 +3,14 @@
   "private": true,
   "workspaces": [
     "packages/*",
+    "packages/plugins/*",
     "examples/*"
   ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "build": "pnpm --filter @genie/core build && pnpm --filter @genie/wallet-plugin build"
+    "build": "pnpm -r --filter=!@genie/plugin-example build",
+    "test": "pnpm -r --filter=@genie/core test",
+    "test:watch": "pnpm -r --filter=@genie/core test:watch"
   },
   "dependencies": {
   },
