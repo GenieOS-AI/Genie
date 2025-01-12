@@ -1,6 +1,13 @@
+export enum NetworkName {
+  ETHEREUM = 'ethereum',
+  POLYGON = 'polygon',
+  SOLANA = 'solana'
+}
+
 export type EVMNetworkConfig = {
   chainId: number;
   name: string;
+  displayName?: string;
   rpcUrl: string;
   explorerUrl?: string;
   nativeCurrency: {
@@ -12,6 +19,7 @@ export type EVMNetworkConfig = {
 
 export type SolanaNetworkConfig = {
   name: string;
+  displayName?: string;
   rpcUrl: string;
   explorerUrl?: string;
   wsEndpoint?: string;
@@ -25,6 +33,6 @@ export type NetworkConfig = {
 };
 
 export type NetworksConfig = {
-  defaultNetwork: string;
-  networks: Record<string, NetworkConfig>;
+  defaultNetwork: NetworkName;
+  networks: Partial<Record<NetworkName, NetworkConfig>>;
 }; 

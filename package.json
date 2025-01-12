@@ -2,8 +2,16 @@
   "name": "genie",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "packages/plugins/*",
+    "examples/*"
   ],
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "build": "pnpm -r --filter=!@genie/plugin-example --filter=!./examples/* build",
+    "test": "pnpm -r --filter=@genie/core test",
+    "test:watch": "pnpm -r --filter=@genie/core test:watch"
+  },
   "dependencies": {
   },
   "devDependencies": {
