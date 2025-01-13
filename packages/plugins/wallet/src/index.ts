@@ -1,4 +1,5 @@
 export { WalletPlugin } from './WalletPlugin';
-export { GetAddressTool } from './tools/GetAddressTool';
-export { GetBalanceTool } from './tools/GetBalanceTool';
+export * from './tools';
 export { WalletAgent } from './WalletAgent'; 
+export * from './handlers';
+export * from './types';
