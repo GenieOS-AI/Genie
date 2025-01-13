@@ -1,0 +1,37 @@
+{
+    "plugins": [
+        {
+            "wallet": {
+                "enabled": true,
+                "tools": [
+                    "getBalance",
+                    "getAddress"
+                ],
+                "services": [
+                    {
+                        "name": "birdeye",
+                        "tools": [
+                            {
+                                "name": "getBalance",
+                                "enabled": true,
+                                "networks": ["solana", "ethereum"],
+                                "priority": 100
+                            }
+                        ]
+                    },
+                    {
+                        "name": "dexscreener",
+                        "tools": [
+                            {
+                                "name": "getBalance",
+                                "enabled": true,
+                                "networks": ["polygon"],
+                                "priority": 1
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

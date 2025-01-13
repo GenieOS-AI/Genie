@@ -8,6 +8,10 @@ import { SystemMessage } from '@langchain/core/messages';
 import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
 import { env } from '../environment';
 import { BaseTool } from './plugins/tools/BaseTool';
+import { Handler } from '../services/handlers/handler';
+import { IHandlerRequest } from '../services/types/handler';
+import { IHandlerResponse } from '../services/types/handler';
+import { ToolInput, ToolOutput } from './types';
 
 export class BaseAgent implements Agent {
   public readonly id: string;
@@ -108,7 +112,7 @@ export class BaseAgent implements Agent {
     return result.output;
   }
 
-  addTool(tool: BaseTool<any>): void {
+  addTool(tool: BaseTool<ToolInput, ToolOutput, Handler<IHandlerRequest, IHandlerResponse>>): void {
     this.context.tools.push(tool);
     // Reinitialize agent if it was already initialized to include new tool
     if (this.context.executor) {
