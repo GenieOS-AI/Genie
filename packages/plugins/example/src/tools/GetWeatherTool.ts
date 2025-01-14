@@ -9,16 +9,15 @@ const weatherInputSchema = z.object({
 });
 
 export class GetWeatherTool extends BaseTool<WeatherInput, WeatherOutput, any> {
-
+  static readonly TOOL_NAME = 'get_weather';
   constructor(
     agent: Agent, 
-    handlers?: any[],
     callback?: (toolName: string, input: WeatherInput, output: WeatherOutput) => void
   ) {
     super(
       agent,
       {
-        name: 'get_weather',
+        name: GetWeatherTool.TOOL_NAME,
         description: 'Get the current weather for a specific city',
         schema: weatherInputSchema as any,
         examples: [
@@ -33,7 +32,6 @@ export class GetWeatherTool extends BaseTool<WeatherInput, WeatherOutput, any> {
           }
         ]
       },
-      handlers,
       callback
     );
   }
