@@ -3,11 +3,12 @@ import { BaseTool, NetworkName, ToolConfig, Agent } from '@genie/core';
 import { GetAddressToolInput, GetAddressToolOutput } from '../types/tool';
 
 export class GetAddressTool extends BaseTool<GetAddressToolInput, GetAddressToolOutput, any> {
-  constructor(agent: Agent, handlers?: any[], callback?: (toolName: string, input: GetAddressToolInput, output: GetAddressToolOutput) => void) {
+  public static readonly TOOL_NAME = 'get_address';
+  constructor(agent: Agent, callback?: (toolName: string, input: GetAddressToolInput, output: GetAddressToolOutput) => void) {
     const supportedNetworks = agent.dependencies.network.getSupportedNetworks();
     
     const config: ToolConfig<GetAddressToolInput> = {
-      name: 'get_address',
+      name: GetAddressTool.TOOL_NAME,
       description: 'Get the wallet address for one or all networks. If network is not specified, returns addresses for all supported networks.',
       schema: z.object({
         network: z.enum(supportedNetworks as [string, ...string[]]).optional()
@@ -29,7 +30,7 @@ export class GetAddressTool extends BaseTool<GetAddressToolInput, GetAddressTool
       ]
     };
 
-    super(agent, config, handlers, callback);
+    super(agent, config, callback);
   }
 
   validateInput(input: GetAddressToolInput): { status: boolean; errors?: string[] } {
