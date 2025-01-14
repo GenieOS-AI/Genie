@@ -1,5 +1,5 @@
-import { AgentFactory, env, ModelProvider, NetworkManager, Wallet, NetworkName } from '@genie/core';
-import { WeatherPlugin } from '@genie/example-plugin';
+import { ModelProvider, NetworkManager, Wallet, NetworkName, BaseAgent } from '@genie/core';
+import { GetWeatherTool, WeatherPlugin } from '@genie/example-plugin';
 
 async function main() {
   // Setup dependencies
@@ -32,18 +32,39 @@ async function main() {
     wallet
   };
 
-  // Initialize the primary agent with weather plugin
-  const primaryAgent = await AgentFactory.createAndInitializeAgent({
-    provider: ModelProvider.OPENAI,
-    model: process.env.OPENAI_MODEL || 'gpt-4-turbo-preview',
+  const primaryAgent = new BaseAgent({
+    model: {
+      config: {
+        model: process.env.OPENAI_MODEL || 'gpt-4-turbo-preview',
+      },
+      provider: ModelProvider.OPENAI,
+    },
     plugins: [new WeatherPlugin()],
+    services: [],
   }, dependencies);
 
-  // Initialize the assistant agent
-  const assistantAgent = await AgentFactory.createAndInitializeAgent({
-    provider: ModelProvider.OPENAI,
-    model: process.env.OPENAI_MODEL || 'gpt-4-turbo-preview',
+  await primaryAgent.initialize({
+    plugins: [
+      {
+        weather: {
+          tools: [GetWeatherTool.TOOL_NAME],
+        }
+      }
+    ]
+  });
+
+  const assistantAgent = new BaseAgent({
+    model: {
+      config: {
+        model: process.env.OPENAI_MODEL || 'gpt-4-turbo-preview',
+      },
+      provider: ModelProvider.OPENAI,
+    },
+    plugins: [],
+    services: [],
   }, dependencies);
+
+  await assistantAgent.initialize();
 
   try {
     // Create a simple workflow where:
