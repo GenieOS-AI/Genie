@@ -1,9 +1,7 @@
 import { z } from 'zod';
 import { BaseTool } from '@genie/core';
 import { WeatherInput, WeatherOutput } from '../types';
-import { ToolConfig, Agent } from '@genie/core';
-import { IHandlerRequest, IHandlerResponse } from '@genie/core';
-import { Handler } from '@genie/core/src/services/handlers/handler';
+import { Agent } from '@genie/core';
 
 const weatherInputSchema = z.object({
   city: z.string().describe('The city to get weather for'),

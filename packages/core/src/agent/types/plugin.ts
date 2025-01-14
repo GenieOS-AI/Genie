@@ -1,7 +1,7 @@
 import { Agent } from './agent';
 import { BaseTool } from '../plugins/tools/BaseTool';
 import { IHandlerResponse } from '../../services/types/handler';
-import { Handler } from '../../services/handlers/handler';
+import { Handler } from '../../services';
 import { IHandlerRequest } from '../../services/types/handler';
 import { ToolInput, ToolOutput } from './tool';
 

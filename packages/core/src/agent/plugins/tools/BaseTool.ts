@@ -3,7 +3,7 @@ import { Agent } from '../../types/agent';
 import { ToolConfig } from '../index';
 import { StructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
-import { Handler } from '../../../services/handlers/handler';
+import { Handler } from '../../../services';
 import { IHandlerResponse } from '../../../services/types/handler';
 import { IHandlerRequest } from '../../../services/types/handler';
 import { ToolInput, ToolOutput } from '../../types';

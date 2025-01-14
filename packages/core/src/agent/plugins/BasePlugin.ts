@@ -1,7 +1,7 @@
 import { Plugin, PluginMetadata, PluginOptions, PluginCallback, PluginCallbackData } from '../types/plugin';
 import { Agent } from '../types/agent';
 import { BaseTool } from './tools/BaseTool';
-import { Handler } from '../../services/handlers/handler';
+import { Handler } from '../../services';
 import { IHandlerRequest } from '../../services/types/handler';
 import { IHandlerResponse } from '../../services/types/handler';
 import { ToolInput, ToolOutput } from '../types';

@@ -6,7 +6,7 @@ import { AgentExecutor } from 'langchain/agents';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { Plugin } from './plugin';
 import { BaseTool } from '../plugins/tools/BaseTool';
-import { Handler } from '../../services/handlers/handler';
+import { Handler } from '../../services';
 import { IHandlerResponse } from '../../services/types/handler';
 import { IHandlerRequest } from '../../services/types/handler';
 import { ToolInput, ToolOutput } from './tool';
