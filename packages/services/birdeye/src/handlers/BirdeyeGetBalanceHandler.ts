@@ -46,14 +46,14 @@ export class BirdeyeGetBalanceHandler extends GetBalanceHandler {
                             address: token.address,
                             decimals: token.decimals,
                             amount: token.balance,
-                            uiAmount: token.uiAmount.toString(),
-                            usdValue: token.valueUsd.toString(),
+                            uiAmount: token.uiAmount?.toString(),
+                            usdValue: token.valueUsd?.toString(),
                             iconUrl: token.logoURI,
-                            price: token.priceUsd.toString()
+                            price: token.priceUsd?.toString()
                         })),
-                        totalUsdValue: portfolio.data.totalUsd.toString()
+                        totalUsdValue: portfolio.data.totalUsd?.toString()
                     }],
-                    totalUsdValue: portfolio.data.totalUsd.toString()
+                    totalUsdValue: portfolio.data.totalUsd?.toString()
                 }
             };
         } catch (error) {
