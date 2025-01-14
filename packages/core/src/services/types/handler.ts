@@ -6,7 +6,17 @@ export interface IHandlerRequest extends Record<string, unknown> {}
 export interface IHandlerResponse extends ToolOutput {
 }
 
+export interface HandlerConfig {
+    name: string;
+    enabled?: boolean;
+    networks?: NetworkName[];
+    priority?: number;
+}
+
+export type HandlersConfig = HandlerConfig[];
+
 export interface IHandler<Request extends IHandlerRequest, Response extends IHandlerResponse> {
+  tool_name: string;
   priority: number;
   enabled: boolean;
   networks: NetworkName[];

@@ -2,11 +2,14 @@ import { NetworkName } from "../../network";
 import { IHandler, IHandlerRequest, IHandlerResponse } from "../types/handler";
 
 export abstract class Handler<Request extends IHandlerRequest, Response extends IHandlerResponse> implements IHandler<Request, Response> {
+    public readonly tool_name: string;
     public priority: number;
     public enabled: boolean;
     public networks: NetworkName[];
 
-    constructor(priority: number, enabled: boolean, networks: NetworkName[]) {
+
+    constructor(tool_name: string, priority: number, enabled: boolean, networks: NetworkName[]) {
+        this.tool_name = tool_name;
         this.priority = priority;
         this.enabled = enabled;
         this.networks = networks;

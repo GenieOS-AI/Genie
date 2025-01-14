@@ -5,10 +5,10 @@ import { Handler } from '../../services';
 import { IHandlerRequest } from '../../services/types/handler';
 import { IHandlerResponse } from '../../services/types/handler';
 import { ToolInput, ToolOutput } from '../types';
+import { log } from 'console';
 
 type ToolClass = new (
   agent: Agent,
-  handlers: any[],
   callback?: (toolName: string, input: any, output: any) => void
 ) => BaseTool<any, any, any>;
 
@@ -48,10 +48,18 @@ export abstract class BasePlugin implements Plugin {
     return !!this.agent;
   }
 
-  public async initialize(agent: Agent): Promise<void> {
+  public async initialize(agent: Agent, handlers: Handler<IHandlerRequest, IHandlerResponse>[]): Promise<void> {
     this.agent = agent;
     // Initialize tools after agent is set
-    this._tools = this.toolClasses.map(Tool => new Tool(agent, [], this.handleToolCallback.bind(this)));
+    this._tools = await Promise.all(this.toolClasses.map(async Tool => {
+      const tool = new Tool(agent, this.handleToolCallback.bind(this));
+      // Find matching handlers for this tool
+      const toolHandlers = handlers.filter(handler => handler.tool_name === tool.name);
+      if (toolHandlers.length > 0) {
+        await tool.initialize(toolHandlers);
+      }
+      return tool;
+    }));
   }
 
   /**

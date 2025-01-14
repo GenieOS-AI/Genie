@@ -14,7 +14,7 @@ export abstract class BaseTool<T extends ToolInput, U extends ToolOutput, K exte
   protected agent: Agent;
   protected callback?: (toolName: string, input: T, output: U) => void;
   public readonly config: ToolConfig<T>;
-  protected readonly handlers: K[];
+  protected handlers: K[] = [];
 
   name: string;
   description: string;
@@ -29,7 +29,6 @@ export abstract class BaseTool<T extends ToolInput, U extends ToolOutput, K exte
   constructor(
     agent: Agent,
     config: ToolConfig<T>,
-    handlers?: K[],
     callback?: (toolName: string, input: T, output: U) => void
   ) {
     super();
@@ -39,6 +38,9 @@ export abstract class BaseTool<T extends ToolInput, U extends ToolOutput, K exte
     this.name = config.name;
     this.description = config.description + "\n\n" + this.formatExampleMessages();
     this.schema = config.schema;
+  }
+
+  public async initialize(handlers: K[]): Promise<void> {
     this.handlers = (handlers || []).sort((a, b) => b.priority - a.priority);
   }
 

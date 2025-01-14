@@ -55,7 +55,7 @@ export interface Plugin {
   /** List of tools provided by this plugin */
   tools: BaseTool<ToolInput, ToolOutput, Handler<IHandlerRequest, IHandlerResponse>>[];
   /** Initialize the plugin and its tools */
-  initialize(agent: Agent): Promise<void>;
+  initialize(agent: Agent, handlers: Handler<IHandlerRequest, IHandlerResponse>[]): Promise<void>;
   /** Check if the plugin has an agent */
   existAgent(): boolean;
   /** Set the plugin callback */
