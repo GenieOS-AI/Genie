@@ -1,83 +1,120 @@
 import { v4 as uuidv4 } from 'uuid';
 import { ChatOpenAI } from '@langchain/openai';
 import { AgentExecutor, createOpenAIToolsAgent } from 'langchain/agents';
-import { Agent, AgentConfig, AgentContext, AgentDependencies } from './types/agent';
-import { ModelProvider } from './types/model';
+import { Agent, AgentContext, AgentDependencies, } from './types/agent';
+import { ModelProvider , ModelConfig} from './types/model';
 import { getModelConfig } from './config';
 import { SystemMessage } from '@langchain/core/messages';
 import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
-import { env } from '../environment';
-import { BaseTool } from './plugins/tools/BaseTool';
+import { Handler, Service } from '../services';
+import { IHandlerRequest } from '../services/types/handler';
+import { IHandlerResponse } from '../services/types/handler';
+import { AgentPluginConfig, Plugin} from './types';
+import { findServiceConfig, findPluginConfig, getModelApiKey, getModelSettings } from '../utils/agent';
 
 export class BaseAgent implements Agent {
   public readonly id: string;
-  public readonly config: AgentConfig;
   public readonly dependencies: AgentDependencies;
+  public readonly model: {
+    config: ModelConfig;
+    provider: ModelProvider;
+  };
+  public readonly plugins: Plugin[];
+  public readonly services: Service[];
   public context: AgentContext = {
     model: null as unknown as ChatOpenAI,
     tools: [],
   };
-
-  constructor(config: AgentConfig, dependencies: AgentDependencies) {
+  public chatTemplate?: ChatPromptTemplate;
+  
+  constructor(config: {
+    model: {
+      config: ModelConfig;
+      provider: ModelProvider;
+    };
+    plugins?: Plugin[];
+    services?: Service[];
+    chatTemplate?: ChatPromptTemplate;
+  }, dependencies: AgentDependencies) {
     this.id = uuidv4();
-    this.config = config;
+    this.model = config.model;
+    this.plugins = config.plugins ?? [];
+    this.services = config.services ?? [];
     this.dependencies = dependencies;
+    this.chatTemplate = config.chatTemplate;
     this.context.tools = [];
   }
+   
 
-  async initialize(): Promise<void> {
-    // Initialize plugins first if they have initialization logic
-    if (this.config.plugins) {
-      await Promise.all(
-        this.config.plugins.map(async plugin => {
-          await plugin.initialize(this);
-          if (!plugin.existAgent()) {
-            throw new Error('Agent not found after plugin initialization');
-          }
-          // Add tools after plugin is initialized
-          if (plugin.tools) {
-            this.context.tools.push(...plugin.tools);
-          }
-        })
-      );
-    }
-
-    const modelConfig = getModelConfig(this.config.provider);
+  private async initializeServices(
+    pluginConfig?: AgentPluginConfig
+  ): Promise<Handler<IHandlerRequest, IHandlerResponse>[]> {
+    if (!this.services?.length) return [];
     
-    let apiKey: string | undefined;
-    if (modelConfig.apiKeyEnvVarName) {
-      apiKey = env.get(modelConfig.apiKeyEnvVarName);
-      if (!apiKey) {
-        throw new Error(`API key not found in environment for provider ${this.config.provider} (${modelConfig.apiKeyEnvVarName})`);
-      }
-    }
+    const handlers: Handler<IHandlerRequest, IHandlerResponse>[] = [];
+    
+    await Promise.all(
+      this.services.map(async service => {
+        const serviceConfig = findServiceConfig(service.metadata.name, pluginConfig);
+        const toolConfigs = serviceConfig?.tools.map(tool => ({
+            name: tool.name,
+            enabled: tool.enabled,
+            networks: tool.networks,
+            priority: tool.priority
+          })) ?? [];
+        
+        await service.initialize(toolConfigs);
+        handlers.push(...service.handlers);
+      })
+    );
+    
+    return handlers;
+  }
 
-    // Initialize the language model based on provider
-    switch (this.config.provider) {
-      case ModelProvider.OPENAI:
-        this.context.model = new ChatOpenAI({
-          ...(apiKey && { openAIApiKey: apiKey }),
-          modelName: this.config.model,
-          temperature: this.config.temperature,
-          maxTokens: this.config.maxTokens,
-        });
-        break;
-      default:
-        this.context.model = new ChatOpenAI({
-          ...(apiKey && { openAIApiKey: apiKey }),
-          modelName: this.config.model,
-          temperature: this.config.temperature,
-          maxTokens: this.config.maxTokens,
-        });
-        break;
-    }
+  private async initializePlugins(
+    handlers: Handler<IHandlerRequest, IHandlerResponse>[],
+    pluginConfig?: AgentPluginConfig
+  ): Promise<void> {
+    if (!this.plugins?.length) return;
 
+    await Promise.all(
+      this.plugins.map(async plugin => {
+        const config = findPluginConfig(plugin.metadata.name, pluginConfig);
+        await plugin.initialize(this, handlers);
+        
+        if (!plugin.existAgent()) {
+          throw new Error(`Plugin ${plugin.metadata.name} failed to initialize properly`);
+        }
+
+        if (!plugin.tools?.length) return;
+  
+        const toolsToAdd = config?.tools 
+          ? plugin.tools.filter(tool => config?.tools?.includes(tool.name))
+          : plugin.tools;
+        
+          this.context.tools.push(...toolsToAdd);
+      })
+    );
+  }
+
+  private initializeModel(modelConfig: ModelConfig): void {
+    const apiKey = getModelApiKey(modelConfig, this.model.provider);
+    const settings = getModelSettings(modelConfig, this.model.config.settings);
+    
+    this.context.model = new ChatOpenAI({
+      ...(apiKey && { openAIApiKey: apiKey }),
+      modelName: this.model.config.model,
+      ...settings
+    });
+  }
+
+  private async initializeAgent(): Promise<void> {
     const systemMessage = new SystemMessage(
       "You are a helpful AI assistant that can use tools to accomplish tasks. " +
       "Always use tools when available and appropriate for the task."
     );
 
-    const prompt = this.config.chatTemplate ?? ChatPromptTemplate.fromMessages([
+    const prompt = this.chatTemplate ?? ChatPromptTemplate.fromMessages([
       systemMessage,
       ["human", "{input}"],
       new MessagesPlaceholder("agent_scratchpad")
@@ -86,14 +123,32 @@ export class BaseAgent implements Agent {
     const agent = await createOpenAIToolsAgent({
       llm: this.context.model,
       tools: this.context.tools as any[],
-      prompt: prompt,
+      prompt
     });
 
     this.context.executor = new AgentExecutor({
       agent,
       tools: this.context.tools as any[],
-      verbose: this.config.verbose,
+      verbose: this.model.config.settings?.verbose
     });
+  }
+
+  async initialize(pluginConfig?: AgentPluginConfig): Promise<void> {
+    try {
+      // Initialize services and get handlers
+      const handlers = await this.initializeServices(pluginConfig);
+      // Initialize plugins with handlers
+      await this.initializePlugins(handlers, pluginConfig);
+      
+      // Initialize model
+      const modelConfig = getModelConfig(this.model.provider);
+      this.initializeModel(modelConfig);
+      
+      // Initialize agent with tools
+      await this.initializeAgent();
+    } catch (error: unknown) {
+      throw new Error(`Failed to initialize agent: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   async execute(input: string): Promise<string> {
@@ -106,21 +161,5 @@ export class BaseAgent implements Agent {
     });
 
     return result.output;
-  }
-
-  addTool(tool: BaseTool<any>): void {
-    this.context.tools.push(tool);
-    // Reinitialize agent if it was already initialized to include new tool
-    if (this.context.executor) {
-      this.initialize();
-    }
-  }
-
-  removeTool(toolName: string): void {
-    this.context.tools = this.context.tools.filter(tool => tool.name !== toolName);
-    // Reinitialize agent if it was already initialized to update tools
-    if (this.context.executor) {
-      this.initialize();
-    }
   }
 } 

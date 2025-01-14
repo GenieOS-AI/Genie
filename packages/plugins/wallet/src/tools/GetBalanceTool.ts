@@ -2,26 +2,27 @@ import { z } from 'zod';
 import { BaseTool, NetworkName, ToolConfig, Agent } from '@genie/core';
 import { ethers } from 'ethers';
 import { PublicKey } from '@solana/web3.js';
+import { GetBalanceHandler } from '../handlers';
+import { GetBalanceHandlerRequest, GetBalanceToolInput, GetBalanceToolOutput, NetworkBalance } from '../types';
+import { log } from 'console';
 
-export interface GetBalanceInput extends Record<string, unknown> {
-  network?: NetworkName;
-}
-
-export class GetBalanceTool extends BaseTool<GetBalanceInput> {
-  constructor(agent: Agent, callback?: (toolName: string, input: GetBalanceInput, output: string) => void) {
+export class GetBalanceTool extends BaseTool<GetBalanceToolInput, GetBalanceToolOutput, GetBalanceHandler> {
+  public static readonly TOOL_NAME = 'get_balance';
+  constructor(agent: Agent, callback?: (toolName: string, input: GetBalanceToolInput, output: GetBalanceToolOutput) => void) {
     const supportedNetworks = agent.dependencies.network.getSupportedNetworks();
     
-    const config: ToolConfig<GetBalanceInput> = {
-      name: 'get_balance',
+    const config: ToolConfig<GetBalanceToolInput> = {
+      name: GetBalanceTool.TOOL_NAME,
       description: 'Get the wallet balance for one or all networks. If network is not specified, returns balances for all supported networks.',
       schema: z.object({
-        network: z.enum(supportedNetworks as [string, ...string[]]).optional().describe('The network to get the balance for. If not provided, returns balances for all networks.')
+        networks: z.array(z.enum(supportedNetworks as [string, ...string[]])).optional()
+          .describe('The networks to get balances for. If not provided, returns balances for all networks.')
       }) as any,
       examples: [
         {
           user: `What is my ${supportedNetworks[0]} balance?`,
           tool: {
-            params: { network: supportedNetworks[0] }
+            params: { networks: [supportedNetworks[0]] }
           }
         },
         {
@@ -36,7 +37,7 @@ export class GetBalanceTool extends BaseTool<GetBalanceInput> {
     super(agent, config, callback);
   }
 
-  validateInput(input: GetBalanceInput): { status: boolean; errors?: string[] } {
+  validateInput(input: GetBalanceToolInput): { status: boolean; errors?: string[] } {
     const errors: string[] = [];
     
     if (input.network) {
@@ -52,39 +53,82 @@ export class GetBalanceTool extends BaseTool<GetBalanceInput> {
     };
   }
 
-  protected async execute(input: GetBalanceInput): Promise<string> {
-    const { wallet, network } = this.agent.dependencies;
+  protected async execute(input: GetBalanceToolInput): Promise<GetBalanceToolOutput> {
+    const { wallet } = this.agent.dependencies;
+    const networksToQuery = input.networks?.length ? input.networks : this.agent.dependencies.network.getSupportedNetworks();
+    
+    // Get addresses for each network
+    const networkAddresses = await Promise.all(
+      networksToQuery.map(async (network) => ({
+        network,
+        address: await wallet.getAddress(network)
+      }))
+    );
 
-    async function getBalanceForNetwork(networkName: NetworkName): Promise<string> {
-      const address = await wallet.getAddress(networkName);
-      const provider = network.getProvider(networkName);
-      const networkType = network.getNetworkConfig(networkName).type;
+    let allBalances: NetworkBalance[] = [];
+    let totalUsdValue: string | undefined;
 
-      let balance: string;
-      if (networkType === 'evm') {
-        const rawBalance = await (provider as ethers.Provider).getBalance(address);
-        balance = ethers.formatEther(rawBalance);
-        return `${networkName}: ${balance} ETH`;
-      } else {
-        const pubKey = new PublicKey(address);
-        const connection = provider as any;
-        const rawBalance = await connection.getBalance(pubKey);
-        balance = (Number(rawBalance) / 1e9).toString();
-        return `${networkName}: ${balance} SOL`;
+    // Try each handler for each network
+    for (const { network, address } of networkAddresses) {
+      const request: GetBalanceHandlerRequest = {
+        address,
+        networks: [network]
+      };
+
+      console.log('Request:', request);
+
+      let networkHandled = false;
+
+      // Try each handler in priority order until one succeeds for this network
+      for (const handler of this.handlers) {
+        try {
+          // Skip disabled handlers
+          if (!handler.enabled) continue;
+
+          // Check if handler supports this network
+          if (!handler.isNetworkSupported(network)) continue;
+
+          const response = await handler.execute(request);
+
+          // If handler execution was successful, store the balance
+          if (response.status === 'success' && response.data) {
+            allBalances = [...allBalances, ...response.data.balances];
+            if (response.data.totalUsdValue) {
+              totalUsdValue = totalUsdValue 
+                ? (parseFloat(totalUsdValue) + parseFloat(response.data.totalUsdValue)).toString()
+                : response.data.totalUsdValue;
+            }
+            networkHandled = true;
+            break;
+          } else {
+            console.log('Handler failed:', response);
+          }
+        } catch (error) {
+          console.error(`Handler ${handler.constructor.name} failed for network ${network}:`, error);
+          // Continue to next handler on error
+          continue;
+        }
+      }
+
+      if (!networkHandled) {
+        console.warn(`No handler was able to get balance for network ${network}`);
       }
     }
 
-    if (input.network) {
-      const balanceStr = await getBalanceForNetwork(input.network);
-      return `Your wallet balance: ${balanceStr}`;
+    // Return error only if no balances were retrieved at all
+    if (allBalances.length === 0) {
+      return {
+        status: 'error',
+        message: 'No handler was able to successfully get any balances'
+      };
     }
 
-    // Get balances for all supported networks
-    const supportedNetworks = network.getSupportedNetworks();
-    const balances = await Promise.all(
-      supportedNetworks.map(getBalanceForNetwork)
-    );
-
-    return `Your wallet balances:\n${balances.join('\n')}`;
+    return {
+      status: 'success',
+      data: {
+        balances: allBalances,
+        ...(totalUsdValue && { totalUsdValue })
+      }
+    };
   }
 } 

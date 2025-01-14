@@ -11,7 +11,8 @@
   "dependencies": {
     "@genie/core": "workspace:*",
     "@genie/example-plugin": "workspace:*",
-    "@genie/wallet-plugin": "workspace:*"
+    "@genie/wallet-plugin": "workspace:*",
+    "@genie/birdeye-service": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.0.0",

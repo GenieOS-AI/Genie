@@ -1,6 +1,5 @@
 import { PluginMetadata, Agent, BasePlugin } from '@genie/core';
-import { GetAddressTool } from './tools/GetAddressTool';
-import { GetBalanceTool } from './tools/GetBalanceTool';
+import { GetAddressTool, GetBalanceTool } from './tools';
 import packageJson from '../package.json';
 
 export class WalletPlugin extends BasePlugin {

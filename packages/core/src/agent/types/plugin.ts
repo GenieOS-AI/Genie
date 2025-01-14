@@ -1,5 +1,9 @@
 import { Agent } from './agent';
 import { BaseTool } from '../plugins/tools/BaseTool';
+import { IHandlerResponse } from '../../services/types/handler';
+import { Handler } from '../../services';
+import { IHandlerRequest } from '../../services/types/handler';
+import { ToolInput, ToolOutput } from './tool';
 
 /**
  * Metadata information for a plugin
@@ -30,8 +34,8 @@ export interface PluginCallbackData {
   /** Tool-specific data if the callback is from a tool */
   tool?: {
     name: string;
-    input: Record<string, unknown>;
-    output: string;
+    input: ToolInput;
+    output: ToolOutput;
   };
   /** Any additional data */
   [key: string]: unknown;
@@ -49,9 +53,9 @@ export interface Plugin {
   /** Plugin metadata */
   metadata: PluginMetadata;
   /** List of tools provided by this plugin */
-  tools: BaseTool<any>[];
+  tools: BaseTool<ToolInput, ToolOutput, Handler<IHandlerRequest, IHandlerResponse>>[];
   /** Initialize the plugin and its tools */
-  initialize(agent: Agent): Promise<void>;
+  initialize(agent: Agent, handlers: Handler<IHandlerRequest, IHandlerResponse>[]): Promise<void>;
   /** Check if the plugin has an agent */
   existAgent(): boolean;
   /** Set the plugin callback */

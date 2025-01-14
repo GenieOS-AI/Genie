@@ -1,8 +1,16 @@
 import { Plugin, PluginMetadata, PluginOptions, PluginCallback, PluginCallbackData } from '../types/plugin';
 import { Agent } from '../types/agent';
 import { BaseTool } from './tools/BaseTool';
+import { Handler } from '../../services';
+import { IHandlerRequest } from '../../services/types/handler';
+import { IHandlerResponse } from '../../services/types/handler';
+import { ToolInput, ToolOutput } from '../types';
+import { log } from 'console';
 
-type ToolClass = new (agent: Agent, callback?: (toolName: string, input: Record<string, unknown>, output: string) => void) => BaseTool<any>;
+type ToolClass = new (
+  agent: Agent,
+  callback?: (toolName: string, input: any, output: any) => void
+) => BaseTool<any, any, any>;
 
 /**
  * Base plugin class that implements the Plugin interface
@@ -11,7 +19,7 @@ type ToolClass = new (agent: Agent, callback?: (toolName: string, input: Record<
 export abstract class BasePlugin implements Plugin {
   public readonly metadata: PluginMetadata;
   protected options: PluginOptions;
-  protected _tools: BaseTool<any>[] = [];
+  protected _tools: BaseTool<ToolInput, ToolOutput, Handler<IHandlerRequest, IHandlerResponse>>[] = [];
   protected agent!: Agent;
   protected callback?: PluginCallback;
   private toolClasses: ToolClass[] = [];
@@ -40,10 +48,18 @@ export abstract class BasePlugin implements Plugin {
     return !!this.agent;
   }
 
-  public async initialize(agent: Agent): Promise<void> {
+  public async initialize(agent: Agent, handlers: Handler<IHandlerRequest, IHandlerResponse>[]): Promise<void> {
     this.agent = agent;
     // Initialize tools after agent is set
-    this._tools = this.toolClasses.map(Tool => new Tool(agent, this.handleToolCallback.bind(this)));
+    this._tools = await Promise.all(this.toolClasses.map(async Tool => {
+      const tool = new Tool(agent, this.handleToolCallback.bind(this));
+      // Find matching handlers for this tool
+      const toolHandlers = handlers.filter(handler => handler.tool_name === tool.name);
+      if (toolHandlers.length > 0) {
+        await tool.initialize(toolHandlers);
+      }
+      return tool;
+    }));
   }
 
   /**
@@ -56,14 +72,14 @@ export abstract class BasePlugin implements Plugin {
   /**
    * Get all tools provided by this plugin
    */
-  get tools(): BaseTool<any>[] {
+  get tools(): BaseTool<any, any, Handler<IHandlerRequest, IHandlerResponse>>[] {
     return this._tools;
   }
 
   /**
    * Handle tool execution callback
    */
-  protected handleToolCallback(toolName: string, input: Record<string, unknown>, output: string): void {
+  protected handleToolCallback(toolName: string, input: ToolInput, output: ToolOutput): void {
     if (this.callback) {
       const data: PluginCallbackData = {
         tool: {

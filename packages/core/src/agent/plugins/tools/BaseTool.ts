@@ -3,13 +3,18 @@ import { Agent } from '../../types/agent';
 import { ToolConfig } from '../index';
 import { StructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
+import { Handler } from '../../../services';
+import { IHandlerResponse } from '../../../services/types/handler';
+import { IHandlerRequest } from '../../../services/types/handler';
+import { ToolInput, ToolOutput } from '../../types';
 /**
  * Base tool class that extends LangChain's Tool with agent and callback support
  */
-export abstract class BaseTool<T extends Record<string, unknown>> extends StructuredTool {
+export abstract class BaseTool<T extends ToolInput, U extends ToolOutput, K extends Handler<IHandlerRequest, IHandlerResponse>> extends StructuredTool {
   protected agent: Agent;
-  protected callback?: (toolName: string, input: T, output: string) => void;
+  protected callback?: (toolName: string, input: T, output: U) => void;
   public readonly config: ToolConfig<T>;
+  protected handlers: K[] = [];
 
   name: string;
   description: string;
@@ -24,7 +29,7 @@ export abstract class BaseTool<T extends Record<string, unknown>> extends Struct
   constructor(
     agent: Agent,
     config: ToolConfig<T>,
-    callback?: (toolName: string, input: T, output: string) => void
+    callback?: (toolName: string, input: T, output: U) => void
   ) {
     super();
     this.agent = agent;
@@ -33,6 +38,10 @@ export abstract class BaseTool<T extends Record<string, unknown>> extends Struct
     this.name = config.name;
     this.description = config.description + "\n\n" + this.formatExampleMessages();
     this.schema = config.schema;
+  }
+
+  public async initialize(handlers: K[]): Promise<void> {
+    this.handlers = (handlers || []).sort((a, b) => b.priority - a.priority);
   }
 
   /**
@@ -74,12 +83,12 @@ Assistant: Use the ${this.name} tool with the following parameters: ${params}`;
     }
     const output = await this.execute(input);
     this.callback?.(this.name, input, output);
-    return output;
+    return JSON.stringify(output);
   }
 
   /**
    * Abstract method that implements the tool's core functionality
    * @param input The input to process
    */
-  protected abstract execute(input: T): Promise<string>;
+  protected abstract execute(input: T): Promise<U>;
 } 

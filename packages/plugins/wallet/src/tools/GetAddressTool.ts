@@ -1,16 +1,14 @@
 import { z } from 'zod';
 import { BaseTool, NetworkName, ToolConfig, Agent } from '@genie/core';
+import { GetAddressToolInput, GetAddressToolOutput } from '../types/tool';
 
-interface GetAddressInput extends Record<string, unknown> {
-  network?: NetworkName;
-}
-
-export class GetAddressTool extends BaseTool<GetAddressInput> {
-  constructor(agent: Agent, callback?: (toolName: string, input: GetAddressInput, output: string) => void) {
+export class GetAddressTool extends BaseTool<GetAddressToolInput, GetAddressToolOutput, any> {
+  public static readonly TOOL_NAME = 'get_address';
+  constructor(agent: Agent, callback?: (toolName: string, input: GetAddressToolInput, output: GetAddressToolOutput) => void) {
     const supportedNetworks = agent.dependencies.network.getSupportedNetworks();
     
-    const config: ToolConfig<GetAddressInput> = {
-      name: 'get_address',
+    const config: ToolConfig<GetAddressToolInput> = {
+      name: GetAddressTool.TOOL_NAME,
       description: 'Get the wallet address for one or all networks. If network is not specified, returns addresses for all supported networks.',
       schema: z.object({
         network: z.enum(supportedNetworks as [string, ...string[]]).optional()
@@ -35,7 +33,7 @@ export class GetAddressTool extends BaseTool<GetAddressInput> {
     super(agent, config, callback);
   }
 
-  validateInput(input: GetAddressInput): { status: boolean; errors?: string[] } {
+  validateInput(input: GetAddressToolInput): { status: boolean; errors?: string[] } {
     const errors: string[] = [];
     const supportedNetworks = this.agent.dependencies.network.getSupportedNetworks();
 
@@ -49,23 +47,21 @@ export class GetAddressTool extends BaseTool<GetAddressInput> {
     };
   }
 
-  protected async execute(input: GetAddressInput): Promise<string> {
+  protected async execute(input: GetAddressToolInput): Promise<GetAddressToolOutput> {
     const { wallet, network } = this.agent.dependencies;
-    
-    if (input.network) {
-      const address = await wallet.getAddress(input.network);
-      return `The wallet address for ${input.network} is: ${address}`;
-    }
+    const networksToQuery = input.networks?.length ? input.networks : network.getSupportedNetworks();
+    const addresses: Partial<Record<NetworkName, string>> = {};
 
-    // Get addresses for all supported networks
-    const supportedNetworks = network.getSupportedNetworks();
-    const addresses = await Promise.all(
-      supportedNetworks.map(async (networkName) => {
+    await Promise.all(
+      networksToQuery.map(async (networkName) => {
         const address = await wallet.getAddress(networkName);
-        return `${networkName}: ${address}`;
+        addresses[networkName] = address;
       })
     );
 
-    return `Your wallet addresses:\n${addresses.join('\n')}`;
+    return {
+      status: 'success',
+      data: addresses
+    };
   }
 } 

@@ -1,5 +1,6 @@
-import { AgentFactory, env, ModelProvider, NetworkManager, Wallet, NetworkName } from '@genie/core';
-import { WalletAgent, WalletPlugin } from '@genie/wallet-plugin';
+import { ModelProvider, NetworkManager, Wallet, NetworkName } from '@genie/core';
+import { GetAddressTool, GetBalanceTool, WalletAgent, WalletPlugin } from '@genie/wallet-plugin';
+import { BirdeyeService } from '@genie/birdeye-service';
 
 async function main() {
   // Setup dependencies
@@ -19,6 +20,13 @@ async function main() {
           },
         },
       },
+      [NetworkName.SOLANA]: {
+        type: 'solana',
+        config: {
+          name: 'Solana Mainnet',
+          rpcUrl: process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com',
+        },
+      },
     }
   });
 
@@ -34,12 +42,34 @@ async function main() {
 
   // Initialize the wallet agent with wallet plugin
   const walletAgent = new WalletAgent({
-    provider: ModelProvider.OPENAI,
-    model: process.env.OPENAI_MODEL || 'gpt-4-turbo-preview',
+    model: {
+      config: {
+        model: process.env.OPENAI_MODEL || 'gpt-4-turbo-preview',
+      },
+      provider: ModelProvider.OPENAI,
+    },
     plugins: [new WalletPlugin()],
+    services: [new BirdeyeService(process.env.BIRDEYE_API_KEY || '')],
   }, dependencies);
 
-  await walletAgent.initialize();
+  await walletAgent.initialize({
+    plugins: [
+      {
+        wallet: {
+          tools: [GetAddressTool.TOOL_NAME, GetBalanceTool.TOOL_NAME],
+          services: [{
+            name: BirdeyeService.SERVICE_NAME,
+            tools: [{
+              name: GetBalanceTool.TOOL_NAME,
+              enabled: true,
+              networks: [NetworkName.ETHEREUM, NetworkName.SOLANA],
+              priority: 100,
+            }],
+          }],
+        }
+      }
+    ]
+  });
 
   try {
     // Example workflow:
