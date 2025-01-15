@@ -77,7 +77,7 @@ export abstract class Plugin implements IPlugin {
       }
       return tool;
     }));
-    logger.info(`Plugin ${this.metadata.name} initialized with ${this._tools.length} tools`);
+    logger.info(`Plugin ${this.metadata.name} initialized with ${this._tools.length} tools: ${this._tools.map(tool => tool.name).join(', ')}`);
   }
 
   /**
