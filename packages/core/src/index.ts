@@ -3,6 +3,7 @@ export * from './agent';
 export * from './wallet';
 export * from './network';
 export * from './services';
+export * from './utils';
 
 export const VERSION = '0.0.1-alpha.0';
 
