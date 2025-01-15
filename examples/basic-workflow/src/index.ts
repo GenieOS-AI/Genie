@@ -1,4 +1,4 @@
-import { ModelProvider, NetworkManager, Wallet, NetworkName, BaseAgent } from '@genie/core';
+import { ModelProvider, NetworkManager, Wallet, NetworkName, Agent } from '@genie/core';
 import { GetWeatherTool, WeatherPlugin } from '@genie/example-plugin';
 
 async function main() {
@@ -32,7 +32,7 @@ async function main() {
     wallet
   };
 
-  const primaryAgent = new BaseAgent({
+  const primaryAgent = new Agent({
     model: {
       config: {
         model: process.env.OPENAI_MODEL || 'gpt-4-turbo-preview',
@@ -53,7 +53,7 @@ async function main() {
     ]
   });
 
-  const assistantAgent = new BaseAgent({
+  const assistantAgent = new Agent({
     model: {
       config: {
         model: process.env.OPENAI_MODEL || 'gpt-4-turbo-preview',

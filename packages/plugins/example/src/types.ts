@@ -1,4 +1,4 @@
-import { ToolInput, ToolOutput } from "@genie/core";
+import { PluginOptions, ToolInput, ToolOutput } from "@genie/core";
 
 export interface WeatherInput extends ToolInput {
   city: string;
@@ -20,7 +20,7 @@ export interface WeatherOutput extends ToolOutput {
   }
 }
 
-export interface WeatherPluginOptions {
+export interface WeatherPluginOptions extends PluginOptions {
   apiKey?: string;
   units?: 'metric' | 'imperial';
 }

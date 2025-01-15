@@ -1,11 +1,10 @@
-import { BasePlugin, Agent, PluginMetadata, IHandlerResponse, IHandlerRequest } from '@genie/core';
+import { Plugin, PluginMetadata, IHandlerResponse, IHandlerRequest, IAgent, IHandler } from '@genie/core';
 import { WeatherPluginOptions } from './types';
 import { GetWeatherTool } from './tools/GetWeatherTool';
 import packageJson from '../package.json';
-import { Handler } from '@genie/core';
 
-export class WeatherPlugin extends BasePlugin {
-  protected readonly options: WeatherPluginOptions;
+export class WeatherPlugin extends Plugin {
+  public readonly options: WeatherPluginOptions;
 
   constructor(options: WeatherPluginOptions = {}) {
     const metadata: PluginMetadata = {
@@ -17,7 +16,7 @@ export class WeatherPlugin extends BasePlugin {
     this.options = options;
   }
 
-  public async initialize(agent: Agent, handlers: Handler<IHandlerRequest, IHandlerResponse>[]): Promise<void> {
+  public async initialize(agent: IAgent, handlers: IHandler<IHandlerRequest, IHandlerResponse>[]): Promise<void> {
     await super.initialize(agent, handlers);
     if (this.options.apiKey) {
       // Initialize weather API client

@@ -1,17 +1,16 @@
 import { z } from 'zod';
-import { BaseTool } from '@genie/core';
+import { IAgent, Tool } from '@genie/core';
 import { WeatherInput, WeatherOutput } from '../types';
-import { Agent } from '@genie/core';
 
 const weatherInputSchema = z.object({
   city: z.string().describe('The city to get weather for'),
   country: z.string().optional().describe('Optional country code (e.g. UK, US)')
 });
 
-export class GetWeatherTool extends BaseTool<WeatherInput, WeatherOutput, any> {
+export class GetWeatherTool extends Tool<WeatherInput, WeatherOutput, any> {
   static readonly TOOL_NAME = 'get_weather';
   constructor(
-    agent: Agent, 
+    agent: IAgent, 
     callback?: (toolName: string, input: WeatherInput, output: WeatherOutput) => void
   ) {
     super(
