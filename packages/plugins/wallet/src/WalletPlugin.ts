@@ -1,8 +1,8 @@
-import { PluginMetadata, Agent, BasePlugin } from '@genie/core';
+import { PluginMetadata, Plugin } from '@genie/core';
 import { GetAddressTool, GetBalanceTool } from './tools';
 import packageJson from '../package.json';
 
-export class WalletPlugin extends BasePlugin {
+export class WalletPlugin extends Plugin {
   constructor() {
     const metadata: PluginMetadata = {
       name: 'wallet',
