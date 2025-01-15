@@ -1,13 +1,13 @@
-import { BaseAgent, AgentDependencies, ModelProvider, ModelConfig, Plugin, Service } from '@genie/core';
+import { AgentDependencies, ModelProvider, ModelConfig, Agent, IService, IPlugin } from '@genie/core';
 
-export class WalletAgent extends BaseAgent {
+export class WalletAgent extends Agent {
   constructor(config: {
     model: {
       config: ModelConfig;
       provider: ModelProvider;
     };
-    plugins?: Plugin[];
-    services?: Service[];
+    plugins?: IPlugin[];
+    services?: IService[];
   }, dependencies: AgentDependencies) {
     super(config, dependencies);
   }

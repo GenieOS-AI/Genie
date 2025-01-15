@@ -1,14 +1,11 @@
 import { z } from 'zod';
-import { BaseTool, NetworkName, ToolConfig, Agent } from '@genie/core';
-import { ethers } from 'ethers';
-import { PublicKey } from '@solana/web3.js';
+import { Tool, ToolConfig, IAgent } from '@genie/core';
 import { GetBalanceHandler } from '../handlers';
 import { GetBalanceHandlerRequest, GetBalanceToolInput, GetBalanceToolOutput, NetworkBalance } from '../types';
-import { log } from 'console';
 
-export class GetBalanceTool extends BaseTool<GetBalanceToolInput, GetBalanceToolOutput, GetBalanceHandler> {
+export class GetBalanceTool extends Tool<GetBalanceToolInput, GetBalanceToolOutput, GetBalanceHandler> {
   public static readonly TOOL_NAME = 'get_balance';
-  constructor(agent: Agent, callback?: (toolName: string, input: GetBalanceToolInput, output: GetBalanceToolOutput) => void) {
+  constructor(agent: IAgent, callback?: (toolName: string, input: GetBalanceToolInput, output: GetBalanceToolOutput) => void) {
     const supportedNetworks = agent.dependencies.network.getSupportedNetworks();
     
     const config: ToolConfig<GetBalanceToolInput> = {

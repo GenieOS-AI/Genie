@@ -4,14 +4,12 @@ import { Wallet } from '../../wallet/Wallet';
 import { NetworkManager } from '../../network/NetworkManager';
 import { AgentExecutor } from 'langchain/agents';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
-import { Plugin } from './plugin';
-import { BaseTool } from '../plugins/tools/BaseTool';
-import { Handler } from '../../services';
-import { IHandlerResponse } from '../../services/types/handler';
+import { IService } from '../../services';
+import { IHandler, IHandlerResponse } from '../../services/types/handler';
 import { IHandlerRequest } from '../../services/types/handler';
 import { ToolInput, ToolOutput } from './tool';
-import { Service } from '../../services/Service';
 import { NetworkName } from '../../network';
+import { IPlugin, Tool } from '../..';
 
 export interface AgentDependencies {
   wallet: Wallet;
@@ -20,7 +18,7 @@ export interface AgentDependencies {
 
 export interface AgentContext {
   model: ChatOpenAI;
-  tools: BaseTool<ToolInput, ToolOutput, Handler<IHandlerRequest, IHandlerResponse>>[];
+  tools: Tool<ToolInput, ToolOutput, IHandler<IHandlerRequest, IHandlerResponse>>[];
   executor?: AgentExecutor;
   memory?: any;
 }
@@ -42,17 +40,17 @@ export interface AgentPluginConfig {
     }>;
   }
 
-export interface Agent {
-  id: string;
-  model: {
+export interface IAgent {
+  readonly id: string;
+  readonly model: {
     config: ModelConfig;
     provider: ModelProvider;
   };
-  chatTemplate?: ChatPromptTemplate;
-  plugins: Plugin[];
-  services: Service[];
-  dependencies: AgentDependencies;
-  context: AgentContext;
-  initialize(): Promise<void>;
+  readonly chatTemplate?: ChatPromptTemplate;
+  readonly plugins: IPlugin[];
+  readonly services: IService[];
+  readonly dependencies: AgentDependencies;
+  readonly context: AgentContext;
+  initialize(pluginConfig?: AgentPluginConfig): Promise<void>;
   execute(input: string): Promise<string>;
 } 

@@ -1,10 +1,10 @@
 import { z } from 'zod';
-import { BaseTool, NetworkName, ToolConfig, Agent } from '@genie/core';
+import { NetworkName, ToolConfig, IAgent, Tool } from '@genie/core';
 import { GetAddressToolInput, GetAddressToolOutput } from '../types/tool';
 
-export class GetAddressTool extends BaseTool<GetAddressToolInput, GetAddressToolOutput, any> {
+export class GetAddressTool extends Tool<GetAddressToolInput, GetAddressToolOutput, any> {
   public static readonly TOOL_NAME = 'get_address';
-  constructor(agent: Agent, callback?: (toolName: string, input: GetAddressToolInput, output: GetAddressToolOutput) => void) {
+  constructor(agent: IAgent, callback?: (toolName: string, input: GetAddressToolInput, output: GetAddressToolOutput) => void) {
     const supportedNetworks = agent.dependencies.network.getSupportedNetworks();
     
     const config: ToolConfig<GetAddressToolInput> = {

@@ -1,27 +1,24 @@
-import { Plugin, PluginMetadata, PluginOptions, PluginCallback, PluginCallbackData } from '../types/plugin';
-import { Agent } from '../types/agent';
-import { BaseTool } from './tools/BaseTool';
-import { Handler } from '../../services';
-import { IHandlerRequest } from '../../services/types/handler';
+import { IPlugin, PluginMetadata, PluginOptions, PluginCallback, PluginCallbackData } from '../types/plugin';
+import { IHandler, IHandlerRequest } from '../../services/types/handler';
 import { IHandlerResponse } from '../../services/types/handler';
-import { ToolInput, ToolOutput } from '../types';
-import { log } from 'console';
+import { IAgent, ToolInput, ToolOutput } from '../types';
+import { Tool } from './tools/Tool';
 
 type ToolClass = new (
-  agent: Agent,
+  agent: IAgent,
   callback?: (toolName: string, input: any, output: any) => void
-) => BaseTool<any, any, any>;
+) => Tool<any, any, any>;
 
 /**
  * Base plugin class that implements the Plugin interface
  * Provides common functionality for managing tools and plugin lifecycle
  */
-export abstract class BasePlugin implements Plugin {
+export abstract class Plugin implements IPlugin {
   public readonly metadata: PluginMetadata;
-  protected options: PluginOptions;
-  protected _tools: BaseTool<ToolInput, ToolOutput, Handler<IHandlerRequest, IHandlerResponse>>[] = [];
-  protected agent!: Agent;
-  protected callback?: PluginCallback;
+  public readonly options: PluginOptions;
+  protected _tools: Tool<ToolInput, ToolOutput, IHandler<IHandlerRequest, IHandlerResponse>>[] = [];
+  protected agent!: IAgent;
+  protected _callback?: PluginCallback;
   private toolClasses: ToolClass[] = [];
 
   /**
@@ -41,6 +38,13 @@ export abstract class BasePlugin implements Plugin {
   }
 
   /**
+   * Clean up any resources used by the plugin
+   */
+  cleanup?(): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
+  /**
    * Initialize the plugin with an agent instance
    * Must be called before using any plugin functionality
    */
@@ -48,7 +52,7 @@ export abstract class BasePlugin implements Plugin {
     return !!this.agent;
   }
 
-  public async initialize(agent: Agent, handlers: Handler<IHandlerRequest, IHandlerResponse>[]): Promise<void> {
+  public async initialize(agent: IAgent, handlers: IHandler<IHandlerRequest, IHandlerResponse>[]): Promise<void> {
     this.agent = agent;
     // Initialize tools after agent is set
     this._tools = await Promise.all(this.toolClasses.map(async Tool => {
@@ -66,13 +70,13 @@ export abstract class BasePlugin implements Plugin {
    * Set the plugin callback
    */
   public setCallback(callback: PluginCallback): void {
-    this.callback = callback;
+    this._callback = callback;
   }
 
   /**
    * Get all tools provided by this plugin
    */
-  get tools(): BaseTool<any, any, Handler<IHandlerRequest, IHandlerResponse>>[] {
+  get tools(): Tool<any, any, IHandler<IHandlerRequest, IHandlerResponse>>[] {
     return this._tools;
   }
 
@@ -80,7 +84,7 @@ export abstract class BasePlugin implements Plugin {
    * Handle tool execution callback
    */
   protected handleToolCallback(toolName: string, input: ToolInput, output: ToolOutput): void {
-    if (this.callback) {
+    if (this._callback) {
       const data: PluginCallbackData = {
         tool: {
           name: toolName,
@@ -88,7 +92,7 @@ export abstract class BasePlugin implements Plugin {
           output
         }
       };
-      this.callback(this.metadata.name, data);
+      this._callback(this.metadata.name, data);
     }
   }
 } 

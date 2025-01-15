@@ -1,39 +1,39 @@
 import { v4 as uuidv4 } from 'uuid';
 import { ChatOpenAI } from '@langchain/openai';
 import { AgentExecutor, createOpenAIToolsAgent } from 'langchain/agents';
-import { Agent, AgentContext, AgentDependencies, } from './types/agent';
+import { IAgent, AgentContext, AgentDependencies, } from './types/agent';
 import { ModelProvider , ModelConfig} from './types/model';
 import { getModelConfig } from './config';
 import { SystemMessage } from '@langchain/core/messages';
 import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
-import { Handler, Service } from '../services';
-import { IHandlerRequest } from '../services/types/handler';
+import { IHandler, IHandlerRequest } from '../services/types/handler';
 import { IHandlerResponse } from '../services/types/handler';
-import { AgentPluginConfig, Plugin} from './types';
+import { AgentPluginConfig, IPlugin} from './types';
 import { findServiceConfig, findPluginConfig, getModelApiKey, getModelSettings } from '../utils/agent';
+import { IService } from '../services/types/service';
 
-export class BaseAgent implements Agent {
+export class Agent implements IAgent {
   public readonly id: string;
   public readonly dependencies: AgentDependencies;
   public readonly model: {
     config: ModelConfig;
     provider: ModelProvider;
   };
-  public readonly plugins: Plugin[];
-  public readonly services: Service[];
-  public context: AgentContext = {
+  public readonly plugins: IPlugin[];
+  public readonly services: IService[];
+  public readonly context: AgentContext = {
     model: null as unknown as ChatOpenAI,
     tools: [],
   };
-  public chatTemplate?: ChatPromptTemplate;
+  public readonly chatTemplate?: ChatPromptTemplate;
   
   constructor(config: {
     model: {
       config: ModelConfig;
       provider: ModelProvider;
     };
-    plugins?: Plugin[];
-    services?: Service[];
+    plugins?: IPlugin[];
+    services?: IService[];
     chatTemplate?: ChatPromptTemplate;
   }, dependencies: AgentDependencies) {
     this.id = uuidv4();
@@ -48,10 +48,10 @@ export class BaseAgent implements Agent {
 
   private async initializeServices(
     pluginConfig?: AgentPluginConfig
-  ): Promise<Handler<IHandlerRequest, IHandlerResponse>[]> {
+  ): Promise<IHandler<IHandlerRequest, IHandlerResponse>[]> {
     if (!this.services?.length) return [];
     
-    const handlers: Handler<IHandlerRequest, IHandlerResponse>[] = [];
+    const handlers: IHandler<IHandlerRequest, IHandlerResponse>[] = [];
     
     await Promise.all(
       this.services.map(async service => {
@@ -60,7 +60,7 @@ export class BaseAgent implements Agent {
             name: tool.name,
             enabled: tool.enabled,
             networks: tool.networks,
-            priority: tool.priority
+            priority: tool.priority 
           })) ?? [];
         
         await service.initialize(toolConfigs);
@@ -72,7 +72,7 @@ export class BaseAgent implements Agent {
   }
 
   private async initializePlugins(
-    handlers: Handler<IHandlerRequest, IHandlerResponse>[],
+    handlers: IHandler<IHandlerRequest, IHandlerResponse>[],
     pluginConfig?: AgentPluginConfig
   ): Promise<void> {
     if (!this.plugins?.length) return;

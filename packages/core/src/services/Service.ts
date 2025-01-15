@@ -1,25 +1,28 @@
-import { Handler } from './handlers/Handler';
-import { IHandlerRequest, IService, ServiceMetadata, ServiceOptions, IHandlerResponse, HandlersConfig } from './types';
+import { IHandlerRequest, IService, ServiceMetadata, ServiceOptions, IHandlerResponse, HandlersConfig, IHandler } from './types';
 
 export abstract class Service implements IService {
-  public readonly metadata: ServiceMetadata;
-  protected options: ServiceOptions;
-  public readonly handlers: Handler<IHandlerRequest, IHandlerResponse>[];
+  public metadata: ServiceMetadata;
+  public options: ServiceOptions;
+  private _handlers: IHandler<IHandlerRequest, IHandlerResponse>[];
 
-  constructor(metadata: ServiceMetadata, handlers: Handler<IHandlerRequest, IHandlerResponse>[], options: ServiceOptions = {}) {
+  constructor(metadata: ServiceMetadata, handlers: IHandler<IHandlerRequest, IHandlerResponse>[], options: ServiceOptions = {}) {
     this.metadata = metadata;
     this.options = options;
-    this.handlers = handlers;
+    this._handlers = handlers;
   }
 
   public async initialize(configs: HandlersConfig = []): Promise<void> {
-    this.handlers.forEach(handler => {
+    this._handlers.forEach(handler => {
         const config = configs.find(c => c.name === handler.constructor.name);
         if (config) {
-            handler.setEnabled(config.enabled ?? handler.enabled);
-            handler.setNetworks(config.networks ?? handler.networks);
-            handler.setPriority(config.priority ?? handler.priority);
+            handler.enabled = config.enabled ?? handler.enabled;
+            handler.networks = config.networks ?? handler.networks;
+            handler.priority = config.priority ?? handler.priority;
         }
     });
+  } 
+
+  get handlers(): IHandler<IHandlerRequest, IHandlerResponse>[] {
+    return this._handlers;
   }
 } 

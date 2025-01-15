@@ -16,10 +16,11 @@ export interface HandlerConfig {
 export type HandlersConfig = HandlerConfig[];
 
 export interface IHandler<Request extends IHandlerRequest, Response extends IHandlerResponse> {
-  tool_name: string;
   priority: number;
   enabled: boolean;
   networks: NetworkName[];
   execute(request: Request): Promise<Response>;
+  get tool_name(): string;
+  isNetworkSupported(network: NetworkName): boolean;
 }
 
