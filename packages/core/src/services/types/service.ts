@@ -1,4 +1,4 @@
-import { HandlersConfig } from "./handler";
+import { HandlersConfig, IHandlerRequest, IHandler, IHandlerResponse } from "./handler";
 
 /**
  * Metadata information for a service
@@ -24,5 +24,6 @@ export interface ServiceOptions {
 
 export interface IService {
   metadata: ServiceMetadata;
+  get handlers(): IHandler<IHandlerRequest, IHandlerResponse>[];
   initialize(configs: HandlersConfig): Promise<void>;
 } 

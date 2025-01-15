@@ -1,17 +1,13 @@
-import { Tool } from '@langchain/core/tools';
-import { Agent } from '../../types/agent';
-import { ToolConfig } from '../index';
+import { IAgent } from '../../types/agent';
 import { StructuredTool } from '@langchain/core/tools';
-import { z } from 'zod';
-import { Handler } from '../../../services';
-import { IHandlerResponse } from '../../../services/types/handler';
+import { IHandler, IHandlerResponse } from '../../../services/types/handler';
 import { IHandlerRequest } from '../../../services/types/handler';
-import { ToolInput, ToolOutput } from '../../types';
+import { ToolConfig, ToolInput, ToolOutput } from '../../types';
 /**
  * Base tool class that extends LangChain's Tool with agent and callback support
  */
-export abstract class BaseTool<T extends ToolInput, U extends ToolOutput, K extends Handler<IHandlerRequest, IHandlerResponse>> extends StructuredTool {
-  protected agent: Agent;
+export abstract class Tool<T extends ToolInput, U extends ToolOutput, K extends IHandler<IHandlerRequest, IHandlerResponse>> extends StructuredTool {
+  protected agent: IAgent;
   protected callback?: (toolName: string, input: T, output: U) => void;
   public readonly config: ToolConfig<T>;
   protected handlers: K[] = [];
@@ -27,7 +23,7 @@ export abstract class BaseTool<T extends ToolInput, U extends ToolOutput, K exte
    * @param callback Optional callback function that receives tool name, input and output
    */
   constructor(
-    agent: Agent,
+    agent: IAgent,
     config: ToolConfig<T>,
     callback?: (toolName: string, input: T, output: U) => void
   ) {

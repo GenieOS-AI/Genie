@@ -1,4 +1,4 @@
-import { AgentPluginConfig, Plugin } from '../agent/types';
+import { AgentPluginConfig, IPlugin } from '../agent/types';
 import { ModelConfig } from '../agent/types/model';
 import { env } from '../environment';
 
