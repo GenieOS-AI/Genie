@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "find . -name 'tsconfig.tsbuildinfo' -type f -delete",
+    "clean": "find . -type d -name 'dist' -not -path '*/node_modules/*' -exec rm -rf {} + && find . -name 'tsconfig.tsbuildinfo' -type f -delete",
     "build": "pnpm clean && pnpm -r --filter=!@genie/plugin-example --filter=!./examples/* build",
     "test": "pnpm -r --filter=@genie/core test",
     "test:watch": "pnpm -r --filter=@genie/core test:watch"

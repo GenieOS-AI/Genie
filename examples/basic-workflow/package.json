@@ -15,7 +15,8 @@
     "@genie/wallet-plugin": "workspace:*",
     "@genie/birdeye-service": "workspace:*",
     "@genie/swap-plugin": "workspace:*",
-    "@genie/jupiter-service": "workspace:*"
+    "@genie/jupiter-service": "workspace:*",
+    "@genie/token-plugin": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.0.0",
