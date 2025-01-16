@@ -29,7 +29,7 @@ export class JupiterExecuteHandler extends ExecuteSwapHandler {
             const newQuoteResponse = await this.service.getApi().getQuote({
                 inputMint: new PublicKey(quote.inputMint),
                 outputMint: new PublicKey(quote.outputMint),
-                amount: quote.swapMode === 'ExactIn' ? quote.inAmount : quote.outAmount,
+                amount: quote.swapMode === 'ExactIn' ? Number(quote.inAmount) : Number(quote.outAmount),
                 slippageBps: quote.slippageBps,
                 swapMode: quote.swapMode
             });

@@ -10,6 +10,7 @@ import {
     JupiterError,
     TokenInfo
 } from './types';
+import { logger } from '@genie/core';
 
 export class JupiterAPI {
     private api: AxiosInstance;
@@ -19,7 +20,7 @@ export class JupiterAPI {
         this.api = axios.create({
             baseURL: baseUrl,
             headers: {
-                'Content-Type': 'application/json'
+                'Accept': 'application/json'
             }
         });
     }

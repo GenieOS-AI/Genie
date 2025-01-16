@@ -1,11 +1,11 @@
 import { PublicKey } from '@solana/web3.js';
-import { NetworkName } from '@genie/core';
+import { logger, NetworkName } from '@genie/core';
 import { SwapQuoteHandler, SwapQuoteHandlerRequest, SwapQuoteHandlerResponse } from '@genie/swap-plugin';
 import { JupiterService } from '../JupiterService';
 import { generateQuoteId } from '../utils';
 import { JupiterAPI } from '../JupiterAPI';
 import { JupiterError } from '../types';
-import { parseUiAmount } from '../utils';
+import { getMint } from '@solana/spl-token';
 
 export class JupiterQuoteHandler extends SwapQuoteHandler {
     private service!: JupiterService;
@@ -25,12 +25,24 @@ export class JupiterQuoteHandler extends SwapQuoteHandler {
             const inputMint = new PublicKey(request.fromToken);
             const outputMint = new PublicKey(request.toToken);
             const slippageBps = request.slippage ? Math.floor(request.slippage * 100) : 50;
+            const connection = await this.service.getConnection();
+            
+            // Get decimals from the mint accounts
+            const [inputMintInfo, outputMintInfo] = await Promise.all([
+                getMint(connection, inputMint),
+                getMint(connection, outputMint)
+            ]);
+
+            // Parse amount with correct decimals based on swap mode
+            const parsedAmount = request.amountType === 'input'
+                ? Math.floor(Number(request.amount) * 10 ** inputMintInfo.decimals)
+                : Math.floor(Number(request.amount) * 10 ** outputMintInfo.decimals);
 
             // Get quote from Jupiter API
             const quoteResponse = await this.service.getApi().getQuote({
                 inputMint,
                 outputMint,
-                amount: request.amount,
+                amount: parsedAmount,
                 slippageBps,
                 swapMode: request.amountType === 'input' ? 'ExactIn' : 'ExactOut'
             });
@@ -46,41 +58,22 @@ export class JupiterQuoteHandler extends SwapQuoteHandler {
             const quoteId = generateQuoteId();
             this.service.cacheQuote(quoteId, quoteResponse);
 
-            // Get token info for decimals
-            const tokens = await this.service.getApi().getTokens();
-            if ('error' in tokens) {
-                return {
-                    status: 'error',
-                    message: tokens.message || tokens.error
-                };
-            }
-
-            const fromToken = tokens.find(t => t.address === request.fromToken);
-            const toToken = tokens.find(t => t.address === request.toToken);
-
-            if (!fromToken || !toToken) {
-                return {
-                    status: 'error',
-                    message: 'Token not found'
-                };
-            }
-
             return {
                 status: 'success',
                 data: {
                     fromToken: {
                         address: request.fromToken,
-                        symbol: fromToken.symbol,
-                        decimals: fromToken.decimals,
+                        symbol: request.fromToken || '', // TODO: get symbol from mint info
+                        decimals: inputMintInfo.decimals,
                         amount: quoteResponse.inAmount,
-                        uiAmount: (Number(quoteResponse.inAmount) / 10 ** fromToken.decimals).toString()
+                        uiAmount: (Number(quoteResponse.inAmount) / 10 ** inputMintInfo.decimals).toString()
                     },
                     toToken: {
                         address: request.toToken,
-                        symbol: toToken.symbol,
-                        decimals: toToken.decimals,
+                        symbol: request.toToken || '', // TODO: get symbol from mint info
+                        decimals: outputMintInfo.decimals,
                         amount: quoteResponse.outAmount,
-                        uiAmount: (Number(quoteResponse.outAmount) / 10 ** toToken.decimals).toString()
+                        uiAmount: (Number(quoteResponse.outAmount) / 10 ** outputMintInfo.decimals).toString()
                     },
                     exchangeRate: (Number(quoteResponse.outAmount) / Number(quoteResponse.inAmount)).toString(),
                     priceImpact: (quoteResponse.priceImpactPct * 100).toString(),

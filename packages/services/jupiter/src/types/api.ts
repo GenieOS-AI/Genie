@@ -11,7 +11,7 @@ export interface TokenAmount {
 export interface JupiterQuoteParams {
     inputMint: PublicKey;
     outputMint: PublicKey;
-    amount: string;
+    amount: number;
     slippageBps?: number;
     swapMode?: SwapMode;
     dexes?: string[];
