@@ -61,6 +61,8 @@ export abstract class Plugin implements IPlugin {
 
   public async initialize(agent: IAgent, handlers: IHandler<IHandlerRequest, IHandlerResponse>[]): Promise<void> {
     logger.info(`Initializing plugin: ${this.metadata.name}`);
+    logger.info(`Handlers: ${handlers.map(handler => handler.constructor.name).join(', ')}`);
+
     this.agent = agent;
     
     // Initialize tools after agent is set

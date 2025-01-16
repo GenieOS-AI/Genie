@@ -27,6 +27,7 @@ export class Agent implements IAgent {
     tools: [],
   };
   public readonly chatTemplate?: ChatPromptTemplate;
+  public readonly systemMessage?: string;
   
   constructor(config: {
     model: {
@@ -36,6 +37,7 @@ export class Agent implements IAgent {
     plugins?: IPlugin[];
     services?: IService[];
     chatTemplate?: ChatPromptTemplate;
+    systemMessage?: string;
   }, dependencies: AgentDependencies) {
     this.id = uuidv4();
     this.model = config.model;
@@ -43,6 +45,7 @@ export class Agent implements IAgent {
     this.services = config.services ?? [];
     this.dependencies = dependencies;
     this.chatTemplate = config.chatTemplate;
+    this.systemMessage = config.systemMessage;
     this.context.tools = [];
   }
    
@@ -67,7 +70,6 @@ export class Agent implements IAgent {
             networks: tool.networks,
             priority: tool.priority 
           })) ?? [];
-        
         await service.initialize(toolConfigs);
         handlers.push(...service.handlers);
         logger.debug(`Service ${service.metadata.name} initialized with ${service.handlers.length} handlers`);
@@ -88,7 +90,6 @@ export class Agent implements IAgent {
 
     await Promise.all(
       this.plugins.map(async plugin => {
-        logger.info(`Initializing plugin: ${plugin.metadata.name}`);
         const config = findPluginConfig(plugin.metadata.name, pluginConfig);
         await plugin.initialize(this, handlers);
         
@@ -129,7 +130,7 @@ export class Agent implements IAgent {
   private async initializeAgent(): Promise<void> {
     logger.info('Initializing agent executor');
     const systemMessage = new SystemMessage(
-      "You are a helpful AI assistant that can use tools to accomplish tasks. " +
+      this.systemMessage ?? "You are a helpful AI assistant that can use tools to accomplish tasks. " +
       "Always use tools when available and appropriate for the task."
     );
 

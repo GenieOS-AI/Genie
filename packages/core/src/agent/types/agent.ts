@@ -46,6 +46,7 @@ export interface IAgent {
     config: ModelConfig;
     provider: ModelProvider;
   };
+  readonly systemMessage?: string;
   readonly chatTemplate?: ChatPromptTemplate;
   readonly plugins: IPlugin[];
   readonly services: IService[];
