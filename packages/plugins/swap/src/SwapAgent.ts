@@ -8,6 +8,7 @@ export class SwapAgent extends Agent {
     };
     plugins?: IPlugin[];
     services?: IService[];
+    systemMessage?: string;
   }, dependencies: AgentDependencies) {
     super(config, dependencies);
   }
