@@ -45,7 +45,7 @@ export class BirdeyeGetBalanceHandler extends GetBalanceHandler {
 
             const portfolio = await this.api.getPortfolio({
                 wallet: request.address,
-                network: birdeyeNetwork
+                chain: birdeyeNetwork
             });
 
             logger.debug('Portfolio data received', { 
