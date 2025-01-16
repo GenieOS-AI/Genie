@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Tool, ToolConfig, IAgent } from '@genie/core';
+import { Tool, ToolConfig, IAgent, logger } from '@genie/core';
 import { SwapQuoteHandler } from '../handlers/SwapQuoteHandler';
 import { SwapQuoteToolInput, SwapQuoteToolOutput, SwapAmountType } from '../types';
 
@@ -13,8 +13,8 @@ export class GetSwapQuoteTool extends Tool<SwapQuoteToolInput, SwapQuoteToolOutp
             name: GetSwapQuoteTool.TOOL_NAME,
             description: 'Get a quote for swapping tokens on a specific network. Can specify either input or output amount.',
             schema: z.object({
-                fromToken: z.string().describe('The token to swap from (address or symbol)'),
-                toToken: z.string().describe('The token to swap to (address or symbol)'),
+                fromToken: z.string().describe('The token to swap from (address)'),
+                toToken: z.string().describe('The token to swap to (address)'),
                 amount: z.string().describe('The amount to swap in human-readable format (e.g., "1.5" ETH or "100" USDC)'),
                 amountType: z.enum(['input', 'output']).describe('Whether the amount is for input or output token'),
                 network: z.enum(supportedNetworks as [string, ...string[]]).describe('The network to perform the swap on'),
@@ -22,11 +22,11 @@ export class GetSwapQuoteTool extends Tool<SwapQuoteToolInput, SwapQuoteToolOutp
             }) as any,
             examples: [
                 {
-                    user: 'Get a quote to swap 1.5 ETH for USDC on Ethereum',
+                    user: 'Get a quote to swap 1.5 ETH (0x0000000000000000000000000000000000000000) for USDC (0x0000000000000000000000000000000000000002) on Ethereum',
                     tool: {
                         params: {
-                            fromToken: 'ETH',
-                            toToken: 'USDC',
+                            fromToken: '0x0000000000000000000000000000000000000000',
+                            toToken: '0x0000000000000000000000000000000000000002',
                             amount: '1.5',
                             amountType: 'input',
                             network: 'ethereum',
@@ -35,11 +35,11 @@ export class GetSwapQuoteTool extends Tool<SwapQuoteToolInput, SwapQuoteToolOutp
                     }
                 },
                 {
-                    user: 'Get a quote to get exactly 1000 USDC by swapping ETH on Ethereum',
+                    user: 'Get a quote to get exactly 1000 USDC (0x0000000000000000000000000000000000000002) by swapping ETH (0x0000000000000000000000000000000000000000) on Ethereum',
                     tool: {
                         params: {
-                            fromToken: 'ETH',
-                            toToken: 'USDC',
+                            fromToken: '0x0000000000000000000000000000000000000000',
+                            toToken: '0x0000000000000000000000000000000000000002',
                             amount: '1000',
                             amountType: 'output',
                             network: 'ethereum',
@@ -92,11 +92,12 @@ export class GetSwapQuoteTool extends Tool<SwapQuoteToolInput, SwapQuoteToolOutp
 
     protected async execute(input: SwapQuoteToolInput): Promise<SwapQuoteToolOutput> {
         // Try each handler in priority order until one succeeds
+        logger.info(`Input: ${JSON.stringify(input)}`);
         for (const handler of this.handlers) {
             try {
                 if (!handler.enabled) continue;
                 if (!handler.isNetworkSupported(input.network)) continue;
-
+                logger.info(`Executing handler ${handler.constructor.name}`);
                 const response = await handler.execute(input);
                 if (response.status === 'success' && response.data) {
                     const { fromToken, toToken, exchangeRate, priceImpact, ...rest } = response.data;
@@ -118,9 +119,11 @@ export class GetSwapQuoteTool extends Tool<SwapQuoteToolInput, SwapQuoteToolOutp
                             ...rest
                         }
                     };
+                } else {
+                    logger.error(`Handler ${handler.constructor.name} returned error:`, response);
                 }
             } catch (error) {
-                console.error(`Handler ${handler.constructor.name} failed:`, error);
+                logger.error(`Handler ${handler.constructor.name} failed:`, error);
                 continue;
             }
         }
