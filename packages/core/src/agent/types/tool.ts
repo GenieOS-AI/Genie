@@ -24,5 +24,6 @@ export interface ToolOutput {
     status: 'success' | 'error';
     message?: string;
     data?: Record<string, unknown>;
+    needHumanConfirmation?: boolean;
 }   
 

@@ -2,13 +2,13 @@ import { z } from 'zod';
 import { NetworkName, ToolConfig, IAgent, Tool } from '@genie/core';
 import { GetAddressToolInput, GetAddressToolOutput } from '../types/tool';
 
-export class GetAddressTool extends Tool<GetAddressToolInput, GetAddressToolOutput, any> {
-  public static readonly TOOL_NAME = 'get_address';
+export class GetWalletAddressTool extends Tool<GetAddressToolInput, GetAddressToolOutput, any> {
+  public static readonly TOOL_NAME = 'get_wallet_address';
   constructor(agent: IAgent, callback?: (toolName: string, input: GetAddressToolInput, output: GetAddressToolOutput) => void) {
     const supportedNetworks = agent.dependencies.network.getSupportedNetworks();
     
     const config: ToolConfig<GetAddressToolInput> = {
-      name: GetAddressTool.TOOL_NAME,
+      name: GetWalletAddressTool.TOOL_NAME,
       description: 'Get the wallet address for one or all networks. If network is not specified, returns addresses for all supported networks.',
       schema: z.object({
         network: z.enum(supportedNetworks as [string, ...string[]]).optional()

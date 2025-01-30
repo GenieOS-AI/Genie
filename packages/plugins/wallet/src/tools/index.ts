@@ -1,2 +1,2 @@
-export * from './GetAddressTool';
+export * from './GetWalletAddressTool';
 export * from './GetBalanceTool';

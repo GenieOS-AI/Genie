@@ -1,5 +1,5 @@
 import { PluginMetadata, Plugin } from '@genie/core';
-import { GetAddressTool, GetBalanceTool } from './tools';
+import { GetWalletAddressTool, GetBalanceTool } from './tools';
 import packageJson from '../package.json';
 
 export class WalletPlugin extends Plugin {
@@ -10,6 +10,6 @@ export class WalletPlugin extends Plugin {
       version: packageJson.version
     };
 
-    super(metadata, [GetAddressTool, GetBalanceTool]);
+    super(metadata, [GetWalletAddressTool, GetBalanceTool]);
   }
 } 

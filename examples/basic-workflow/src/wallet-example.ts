@@ -1,5 +1,5 @@
 import { ModelProvider, NetworkManager, Wallet, NetworkName } from '@genie/core';
-import { GetAddressTool, GetBalanceTool, WalletAgent, WalletPlugin } from '@genie/wallet-plugin';
+import { GetWalletAddressTool, GetBalanceTool, WalletAgent, WalletPlugin } from '@genie/wallet-plugin';
 import { BirdeyeService } from '@genie/birdeye-service';
 
 async function main() {
@@ -56,7 +56,7 @@ async function main() {
     plugins: [
       {
         wallet: {
-          tools: [GetAddressTool.TOOL_NAME, GetBalanceTool.TOOL_NAME],
+          tools: [GetWalletAddressTool.TOOL_NAME, GetBalanceTool.TOOL_NAME],
           services: [{
             name: BirdeyeService.SERVICE_NAME,
             tools: [{
