@@ -1,0 +1,24 @@
+{
+  "name": "@genie/jupiter-service",
+  "version": "0.0.1-alpha.0",
+  "description": "Jupiter DEX aggregator service for Genie",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@genie/core": "workspace:*",
+    "@genie/swap-plugin": "workspace:*",
+    "@solana/web3.js": "^1.98.0",
+    "@solana/spl-token": "^0.4.0",
+    "axios": "^1.6.0",
+    "bs58": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "@types/uuid": "^10.0.0"
+  }
+} 

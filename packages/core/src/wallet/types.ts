@@ -39,8 +39,22 @@ export interface SolanaSignTransactionParams {
 
 export type SignTransactionParams = EVMSignTransactionParams | SolanaSignTransactionParams;
 
+export interface TransactionRequest {
+  to?: string;
+  data?: string;
+  value?: bigint;
+  gasLimit?: bigint;
+}
+
+export interface TransactionReceipt {
+  hash: string;
+  wait: () => Promise<TransactionReceipt>;
+}
+
 export interface WalletInterface {
   getAddress(network: NetworkName): Promise<string>;
   signMessage(params: SignMessageParams): Promise<string>;
   signTransaction(params: SignTransactionParams): Promise<string>;
+  sendTransaction(network: NetworkName, transaction: TransactionRequest): Promise<TransactionReceipt>;
+  signAndSendTransaction(network: NetworkName, transaction: TransactionRequest): Promise<TransactionReceipt>;
 } 

@@ -3,6 +3,7 @@ import { IHandler, IHandlerRequest } from '../../services/types/handler';
 import { IHandlerResponse } from '../../services/types/handler';
 import { IAgent, ToolInput, ToolOutput } from '../types';
 import { Tool } from './tools/Tool';
+import { logger } from '../../utils';
 
 type ToolClass = new (
   agent: IAgent,
@@ -32,6 +33,7 @@ export abstract class Plugin implements IPlugin {
     tools: ToolClass[] = [],
     options: PluginOptions = {}
   ) {
+    logger.debug(`Creating plugin: ${metadata.name}`, { version: metadata.version });
     this.metadata = metadata;
     this.options = options;
     this.toolClasses = tools;
@@ -41,6 +43,7 @@ export abstract class Plugin implements IPlugin {
    * Clean up any resources used by the plugin
    */
   cleanup?(): Promise<void> {
+    logger.debug(`Cleaning up plugin: ${this.metadata.name}`);
     throw new Error('Method not implemented.');
   }
 
@@ -49,27 +52,41 @@ export abstract class Plugin implements IPlugin {
    * Must be called before using any plugin functionality
    */
   public existAgent(): boolean {
-    return !!this.agent;
+    const exists = !!this.agent;
+    if (!exists) {
+      logger.warn(`Agent not set for plugin: ${this.metadata.name}`);
+    }
+    return exists;
   }
 
   public async initialize(agent: IAgent, handlers: IHandler<IHandlerRequest, IHandlerResponse>[]): Promise<void> {
+    logger.info(`Initializing plugin: ${this.metadata.name}`);
+    logger.info(`Handlers: ${handlers.map(handler => handler.constructor.name).join(', ')}`);
+
     this.agent = agent;
+    
     // Initialize tools after agent is set
+    logger.debug(`Initializing ${this.toolClasses.length} tools for plugin: ${this.metadata.name}`);
     this._tools = await Promise.all(this.toolClasses.map(async Tool => {
       const tool = new Tool(agent, this.handleToolCallback.bind(this));
       // Find matching handlers for this tool
       const toolHandlers = handlers.filter(handler => handler.tool_name === tool.name);
       if (toolHandlers.length > 0) {
+        logger.debug(`Found ${toolHandlers.length} handlers for tool: ${tool.name}`);
         await tool.initialize(toolHandlers);
+      } else {
+        logger.warn(`No handlers found for tool: ${tool.name}`);
       }
       return tool;
     }));
+    logger.info(`Plugin ${this.metadata.name} initialized with ${this._tools.length} tools: ${this._tools.map(tool => tool.name).join(', ')}`);
   }
 
   /**
    * Set the plugin callback
    */
   public setCallback(callback: PluginCallback): void {
+    logger.debug(`Setting callback for plugin: ${this.metadata.name}`);
     this._callback = callback;
   }
 
@@ -84,6 +101,7 @@ export abstract class Plugin implements IPlugin {
    * Handle tool execution callback
    */
   protected handleToolCallback(toolName: string, input: ToolInput, output: ToolOutput): void {
+    logger.debug(`Tool callback received for ${toolName}`, { input, output });
     if (this._callback) {
       const data: PluginCallbackData = {
         tool: {
@@ -93,6 +111,9 @@ export abstract class Plugin implements IPlugin {
         }
       };
       this._callback(this.metadata.name, data);
+      logger.debug(`Callback executed for plugin: ${this.metadata.name}`);
+    } else {
+      logger.debug(`No callback registered for plugin: ${this.metadata.name}`);
     }
   }
 } 

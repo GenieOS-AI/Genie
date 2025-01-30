@@ -1,6 +1,7 @@
 import { Handler, IHandlerRequest, Service, ServiceMetadata, IHandlerResponse, NetworkName } from '@genie/core';
 import packageJson from '../package.json';
 import { BirdeyeGetBalanceHandler } from './handlers/BirdeyeGetBalanceHandler';
+import { BirdeyeGetTokenInfoHandler } from './handlers/BirdeyeGetTokenInfoHandler';
 
 export class BirdeyeService extends Service {
     public static readonly SERVICE_NAME = 'birdeye';
@@ -13,7 +14,8 @@ export class BirdeyeService extends Service {
             description: 'Birdeye is a platform that provides real-time data on the performance of your business.',
         };
         const handlers: Handler<IHandlerRequest, IHandlerResponse>[] = [
-            new BirdeyeGetBalanceHandler(apiKey)
+            new BirdeyeGetBalanceHandler(apiKey),
+            new BirdeyeGetTokenInfoHandler(apiKey)
         ];
         super(metadata, handlers, { apiKey });
         this.apiKey = apiKey;
