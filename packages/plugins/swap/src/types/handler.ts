@@ -1,6 +1,6 @@
 import { NetworkName, IHandlerRequest, IHandlerResponse } from "@genie/core";
-import { SwapAmountType, TokenInfo } from "./common";
-import { SwapQuoteToolOutput, ExecuteSwapToolOutput } from "./tool";
+import { SwapAmountType, TokenInfo, TokenAmount } from "./common";
+
 
 export interface SwapQuoteHandlerRequest extends IHandlerRequest {
     fromToken: string;
@@ -27,9 +27,15 @@ export interface SwapQuoteHandlerResponse extends IHandlerResponse {
 
 export interface ExecuteSwapHandlerRequest extends IHandlerRequest {
     quoteId: string;
+    walletAddress: string;
     network: NetworkName;
 }
 
 export interface ExecuteSwapHandlerResponse extends IHandlerResponse {
-    data?: ExecuteSwapToolOutput['data'];
+    data?: {
+        transaction: string;
+        network: NetworkName;
+        fromToken: TokenAmount & { uiAmount: string };
+        toToken: TokenAmount & { uiAmount: string };
+    };
 } 

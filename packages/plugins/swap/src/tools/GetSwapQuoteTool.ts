@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { Tool, ToolConfig, IAgent, logger } from '@genie/core';
 import { SwapQuoteHandler } from '../handlers/SwapQuoteHandler';
 import { SwapQuoteToolInput, SwapQuoteToolOutput, SwapAmountType } from '../types';
+import { interrupt } from '@langchain/langgraph';
 
 export class GetSwapQuoteTool extends Tool<SwapQuoteToolInput, SwapQuoteToolOutput, SwapQuoteHandler> {
     public static readonly TOOL_NAME = 'get_swap_quote';
@@ -101,6 +102,7 @@ export class GetSwapQuoteTool extends Tool<SwapQuoteToolInput, SwapQuoteToolOutp
                 const response = await handler.execute(input);
                 if (response.status === 'success' && response.data) {
                     const { fromToken, toToken, exchangeRate, priceImpact, ...rest } = response.data;
+                    // interrupt("We need confirm the swap quote: ");
                     return {
                         status: 'success',
                         data: {
@@ -117,7 +119,8 @@ export class GetSwapQuoteTool extends Tool<SwapQuoteToolInput, SwapQuoteToolOutp
                             exchangeRate,
                             priceImpact,
                             ...rest
-                        }
+                        },
+                        needHumanConfirmation: true
                     };
                 } else {
                     logger.error(`Handler ${handler.constructor.name} returned error:`, response);

@@ -1,9 +1,10 @@
-import { PublicKey } from '@solana/web3.js';
+import { PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js';
 import { NetworkName } from '@genie/core';
 import { ExecuteSwapHandler, ExecuteSwapHandlerRequest, ExecuteSwapHandlerResponse, QuoteStatus } from '@genie/swap-plugin';
 import { JupiterService } from '../JupiterService';
 import { JupiterAPI } from '../JupiterAPI';
 import { JupiterError, JupiterQuoteResponse } from '../types';
+import { getMint } from '@solana/spl-token';
 
 export class JupiterExecuteHandler extends ExecuteSwapHandler {
     private service!: JupiterService;
@@ -65,36 +66,25 @@ export class JupiterExecuteHandler extends ExecuteSwapHandler {
                 };
             }
 
-            if (!request.userAddress) {
+            if (!request.walletAddress) {
                 return {
                     status: 'error',
                     message: 'User address is required'
                 };
             }
 
-            // Get token info for decimals
-            const tokens = await this.service.getApi().getTokens();
-            if ('error' in tokens) {
-                return {
-                    status: 'error',
-                    message: tokens.message || tokens.error
-                };
-            }
+            const connection = await this.service.getConnection();
 
-            const fromToken = tokens.find(t => t.address === quote.inputMint);
-            const toToken = tokens.find(t => t.address === quote.outputMint);
-
-            if (!fromToken || !toToken) {
-                return {
-                    status: 'error',
-                    message: 'Token not found'
-                };
-            }
+            // get decimals from the mint accounts
+            const [inputMintInfo, outputMintInfo] = await Promise.all([
+                getMint(connection, new PublicKey(quote.inputMint)),
+                getMint(connection, new PublicKey(quote.outputMint))
+            ]);
 
             // Get serialized transactions from Jupiter API
             const swapResult = await this.service.getApi().getSwapTransactions({
                 quoteResponse: quote,
-                userPublicKey: request.userAddress as string
+                userPublicKey: request.walletAddress as string
             });
 
             if ('error' in swapResult) {
@@ -105,25 +95,20 @@ export class JupiterExecuteHandler extends ExecuteSwapHandler {
                 };
             }
 
-            // Send transaction
-            const tx = await this.service.getConnection().sendRawTransaction(
-                Buffer.from(swapResult.swapTransaction, 'base64')
-            );
-
             return {
                 status: 'success',
                 data: {
-                    transactionHash: tx,
-                    status: 'pending',
+                    network: request.network,
+                    transaction: swapResult.swapTransaction,
                     fromToken: {
                         address: quote.inputMint,
                         amount: quote.inAmount,
-                        uiAmount: (Number(quote.inAmount) / 10 ** fromToken.decimals).toString()
+                        uiAmount: (Number(quote.inAmount) / 10 ** inputMintInfo.decimals).toString()
                     },
                     toToken: {
                         address: quote.outputMint,
                         amount: quote.outAmount,
-                        uiAmount: (Number(quote.outAmount) / 10 ** toToken.decimals).toString()
+                        uiAmount: (Number(quote.outAmount) / 10 ** outputMintInfo.decimals).toString()
                     }
                 }
             };

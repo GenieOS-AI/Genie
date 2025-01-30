@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Tool, ToolConfig, IAgent } from '@genie/core';
+import { Tool, ToolConfig, IAgent, logger } from '@genie/core';
 import { ExecuteSwapHandler } from '../handlers/ExecuteSwapHandler';
 import { ExecuteSwapToolInput, ExecuteSwapToolOutput } from '../types';
 
@@ -57,18 +57,42 @@ export class ExecuteSwapTool extends Tool<ExecuteSwapToolInput, ExecuteSwapToolO
             try {
                 if (!handler.enabled) continue;
                 if (!handler.isNetworkSupported(input.network)) continue;
-
                 // Validate quote before execution
                 if (!await handler.validateQuote(input.quoteId)) {
                     continue;
                 }
 
-                const response = await handler.execute(input);
+                const walletAddress = await this.agent.dependencies.wallet.getAddress(input.network);
+
+                const response = await handler.execute({
+                    quoteId: input.quoteId,
+                    network: input.network,
+                    walletAddress: walletAddress
+                });
+
                 if (response.status === 'success' && response.data) {
-                    return {
-                        status: 'success',
-                        data: response.data
-                    };
+
+                    if (response.data.network == 'solana') {
+                        logger.info(`Swapping transaction for ${walletAddress} on ${input.network} with quote ID ${input.quoteId}`);
+                        const transaction = await this.agent.dependencies.wallet.signAndSendTransaction(response.data.network, {data: response.data.transaction});
+                        let txhash = transaction.hash;
+                        await transaction.wait();
+                        return {
+                            status: 'success',
+                            data: {
+                                fromToken: response.data.fromToken,
+                                toToken: response.data.toToken,
+                                network: response.data.network,
+                                status: 'confirmed',
+                                transactionHash: txhash
+                            }
+                        };
+                    } else {
+                        throw new Error('Unsupported network');
+                    }
+                    
+                } else {
+                    throw new Error(response.message);
                 }
             } catch (error) {
                 console.error(`Handler ${handler.constructor.name} failed:`, error);

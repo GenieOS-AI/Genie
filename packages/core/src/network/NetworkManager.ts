@@ -27,7 +27,7 @@ export class NetworkManager {
       this.#evmProviders.set(networkName, provider);
     } else if (networkConfig.type === 'solana') {
       const solanaConfig = networkConfig.config as SolanaNetworkConfig;
-      const connection = new Connection(solanaConfig.rpcUrl);
+      const connection = new Connection(solanaConfig.rpcUrl, 'confirmed');
       this.#solanaConnections.set(networkName, connection);
     }
   }

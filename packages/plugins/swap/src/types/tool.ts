@@ -38,6 +38,7 @@ export interface ExecuteSwapToolInput extends ToolInput {
 export interface ExecuteSwapToolOutput extends ToolOutput {
     data?: {
         transactionHash: string;
+        network: NetworkName;
         status: 'pending' | 'confirmed' | 'failed';
         fromToken: TokenAmount & {
             uiAmount: string;  // Human-readable amount
