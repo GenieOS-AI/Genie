@@ -12,6 +12,8 @@
   "dependencies": {
     "@langchain/community": "^0.3.23",
     "@langchain/core": "^0.3.27",
+    "@langchain/langgraph": "^0.2.41",
+    "@langchain/langgraph-checkpoint": "^0.0.13",
     "@langchain/openai": "^0.3.16",
     "@solana/web3.js": "^1.87.6",
     "bip39": "^3.1.0",

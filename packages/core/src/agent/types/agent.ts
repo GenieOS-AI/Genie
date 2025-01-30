@@ -10,6 +10,8 @@ import { IHandlerRequest } from '../../services/types/handler';
 import { ToolInput, ToolOutput } from './tool';
 import { NetworkName } from '../../network';
 import { IPlugin, Tool } from '../..';
+import { BaseCheckpointSaver, CompiledStateGraph, MemorySaver, StateGraph } from '@langchain/langgraph';
+import { IterableReadableStream } from '@langchain/core/utils/stream';
 
 export interface AgentDependencies {
   wallet: Wallet;
@@ -19,8 +21,9 @@ export interface AgentDependencies {
 export interface AgentContext {
   model: ChatOpenAI;
   tools: Tool<ToolInput, ToolOutput, IHandler<IHandlerRequest, IHandlerResponse>>[];
-  executor?: AgentExecutor;
-  memory?: any;
+  workflow: StateGraph<any, any, any, any, any, any, any>;
+  graph: CompiledStateGraph<any, any, any, any, any, any>;
+  checkpoint?: BaseCheckpointSaver;
 }
 
 export interface AgentPluginConfig {
@@ -40,6 +43,11 @@ export interface AgentPluginConfig {
     }>;
   }
 
+export interface SessionConfig {
+  thread_id?: string;
+  user_id?: string;
+}
+
 export interface IAgent {
   readonly id: string;
   readonly model: {
@@ -53,5 +61,5 @@ export interface IAgent {
   readonly dependencies: AgentDependencies;
   readonly context: AgentContext;
   initialize(pluginConfig?: AgentPluginConfig): Promise<void>;
-  execute(input: string): Promise<string>;
+  execute(input: string, sessionConfig?: SessionConfig): Promise<IterableReadableStream<any>>;
 } 
