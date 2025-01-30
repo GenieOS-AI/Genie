@@ -16,7 +16,11 @@
     "@genie/birdeye-service": "workspace:*",
     "@genie/swap-plugin": "workspace:*",
     "@genie/jupiter-service": "workspace:*",
-    "@genie/token-plugin": "workspace:*"
+    "@genie/token-plugin": "workspace:*",
+    "@langchain/community": "^0.3.23",
+    "@langchain/core": "^0.3.27",
+    "@langchain/openai": "^0.3.16",
+    "@langchain/langgraph": "^0.2.41"
   },
   "devDependencies": {
     "typescript": "^5.0.0",

@@ -1,9 +1,12 @@
-import { ModelProvider, NetworkManager, Wallet, NetworkName } from '@genie/core';
+import { ModelProvider, NetworkManager, Wallet, NetworkName, logger } from '@genie/core';
 import { SwapAgent, SwapPlugin, GetSwapQuoteTool, ExecuteSwapTool } from '@genie/swap-plugin';
 import { WalletPlugin } from '@genie/wallet-plugin';
 import { GetTokenInfoTool, TokenPlugin } from '@genie/token-plugin';
 import { JupiterService } from '@genie/jupiter-service';
 import { BirdeyeService } from '@genie/birdeye-service';
+import { HumanMessage } from '@langchain/core/messages';
+import { Command, MemorySaver } from "@langchain/langgraph";
+
 
 async function main() {
   // Setup dependencies
@@ -63,6 +66,7 @@ async function main() {
       new TokenPlugin(),
       new WalletPlugin() // Required by SwapPlugin
     ],
+   checkpoint: new MemorySaver(),
     services: [new JupiterService({
         rpcUrl: network.getNetworkConfig(NetworkName.SOLANA).config.rpcUrl,
         cluster: 'mainnet-beta'
@@ -112,24 +116,47 @@ async function main() {
   try {
     // Example workflow:
     // 1. Get a quote for swapping 0.1 SOL to USDC
-    console.log('Getting swap quote...');
+    logger.info('Getting swap quote...');
     // const quoteInfo = await swapAgent.execute(
     //   'Swapping 0.1 ETH to USDC on Ethereum'
     // ); 
     
-    const quoteInfo = await swapAgent.execute(
-      'Swapping 0.1 SOL to USDC on Solana'
-    );
-    console.log('Quote received:', quoteInfo);
-
-    // 2. Execute the swap if quote looks good
-    // console.log('\nExecuting swap...');
-    // const swapResult = await swapAgent.execute(
-    //   'Execute the swap with the quoted parameters'
+    // const quoteInfo = await swapAgent.execute(
+    //   {
+    //     messages: [
+    //       new HumanMessage('Swapping 0.1 SOL to USDC on Solana')
+    //     ]
+    //   }
     // );
-    // console.log('Swap executed:', swapResult);
+
+    for await (const chunk of await swapAgent.execute(
+      {
+        messages: [
+          new HumanMessage('Swapping 0.001 SOL to USDC on Solana')
+        ]
+      },
+      {
+        thread_id: "123",
+        user_id: "456"
+      }
+    )) {
+      // logger.info(chunk);
+   }
+
+   logger.info("I waitting the user to approve the swap ----> ");
+
+   for await (const chunk of await swapAgent.execute(
+    new Command({ resume: { text: "I approve the swap" } }), 
+    {
+      thread_id: "123",
+      user_id: "456"
+    }
+ )) {
+    // logger.info(chunk);
+ }
+   
   } catch (error) {
-    console.error('Error during execution:', error);
+    logger.error('Error during execution:', error);
     process.exit(1);
   }
 }
