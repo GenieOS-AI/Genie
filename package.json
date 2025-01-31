@@ -13,9 +13,9 @@
     "build": "pnpm clean && pnpm -r --filter=!@genieos/plugin-example --filter=!./examples/* build",
     "test": "pnpm -r --filter=@genieos/core test",
     "test:watch": "pnpm -r --filter=@genieos/core test:watch",
-    "publish-packages": "lerna publish from-package --yes",
+    "publish-packages": "lerna publish from-package --yes --no-git-tag-version --no-push",
     "validate-packages": "pnpm -r exec npm pack --dry-run",
-    "version": "lerna version --no-private --force-publish --yes --no-git-tag-version --no-push"
+    "version-packages": "lerna version --no-private --force-publish --yes"
   },
   "dependencies": {
   },
