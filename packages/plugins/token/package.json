@@ -1,9 +1,17 @@
 {
   "name": "@genieos/token-plugin",
-  "version": "0.0.2-aplha.0",
+  "version": "0.0.4-alpha.0",
   "description": "Token plugin for Genie",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "test": "jest",
@@ -19,4 +27,4 @@
     "@types/node": "^20.0.0",
     "typescript": "^5.0.0"
   }
-} 
+}
