@@ -1,8 +1,16 @@
 {
-  "name": "@genie/core",
-  "version": "0.0.1-alpha.0",
+  "name": "@genieos/core",
+  "version": "0.0.1-alpha.2",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",

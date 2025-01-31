@@ -1,5 +1,5 @@
 {
-  "name": "@genie/example-plugin",
+  "name": "@genieos/example-plugin",
   "version": "1.0.0",
   "description": "Example plugins for Genie, including a weather plugin",
   "main": "dist/index.js",
@@ -9,7 +9,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@genie/core": "workspace:*",
+    "@genieos/core": "workspace:*",
     "zod": "^3.24.1"
   },
   "devDependencies": {

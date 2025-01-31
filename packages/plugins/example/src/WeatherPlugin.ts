@@ -1,4 +1,4 @@
-import { Plugin, PluginMetadata, IHandlerResponse, IHandlerRequest, IAgent, IHandler } from '@genie/core';
+import { Plugin, PluginMetadata, IHandlerResponse, IHandlerRequest, IAgent, IHandler } from '@genieos/core';
 import { WeatherPluginOptions } from './types';
 import { GetWeatherTool } from './tools/GetWeatherTool';
 import packageJson from '../package.json';

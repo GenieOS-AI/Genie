@@ -1,4 +1,4 @@
-import { NetworkName } from '@genie/core';
+import { NetworkName } from '@genieos/core';
 import { Network } from '../types/request';
 
 export const SUPPORTED_NETWORKS: Network[] = [

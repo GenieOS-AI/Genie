@@ -10,9 +10,13 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "clean": "find . -type d -name 'dist' -not -path '*/node_modules/*' -exec rm -rf {} + && find . -name 'tsconfig.tsbuildinfo' -type f -delete",
-    "build": "pnpm clean && pnpm -r --filter=!@genie/plugin-example --filter=!./examples/* build",
-    "test": "pnpm -r --filter=@genie/core test",
-    "test:watch": "pnpm -r --filter=@genie/core test:watch"
+    "build": "pnpm clean && pnpm -r --filter=!@genieos/plugin-example --filter=!./examples/* build",
+    "test": "pnpm -r --filter=@genieos/core test",
+    "test:watch": "pnpm -r --filter=@genieos/core test:watch",
+    "prepublishOnly": "pnpm run build",
+    "publish-packages": "lerna publish",
+    "validate-packages": "pnpm -r exec npm pack --dry-run",
+    "version": "lerna version"
   },
   "dependencies": {
   },

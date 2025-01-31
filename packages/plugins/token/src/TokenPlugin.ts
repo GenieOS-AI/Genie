@@ -1,4 +1,4 @@
-import { PluginMetadata, Plugin } from '@genie/core';
+import { PluginMetadata, Plugin } from '@genieos/core';
 import { GetTokenInfoTool } from './tools';
 import packageJson from '../package.json';
 

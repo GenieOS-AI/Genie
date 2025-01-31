@@ -1,16 +1,24 @@
 {
-  "name": "@genie/swap-plugin",
+  "name": "@genieos/swap-plugin",
   "version": "0.0.1-alpha.0",
   "description": "Token swap plugin for Genie",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "test": "jest"
   },
   "dependencies": {
-    "@genie/core": "workspace:*",
-    "@genie/wallet-plugin": "workspace:*",
+    "@genieos/core": "workspace:*",
+    "@genieos/wallet-plugin": "workspace:*",
     "@langchain/langgraph": "^0.2.41",
     "@solana/web3.js": "^1.98.0",
     "ethers": "^6.0.0",

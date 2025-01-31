@@ -1,4 +1,4 @@
-import { AgentDependencies, ModelProvider, ModelConfig, Agent, IService, IPlugin } from '@genie/core';
+import { AgentDependencies, ModelProvider, ModelConfig, Agent, IService, IPlugin } from '@genieos/core';
 import { BaseCheckpointSaver } from '@langchain/langgraph';
 
 export class SwapAgent extends Agent {

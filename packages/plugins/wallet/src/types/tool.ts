@@ -1,6 +1,6 @@
-import { ToolInput, ToolOutput } from "@genie/core";
+import { ToolInput, ToolOutput } from "@genieos/core";
 
-import { NetworkName } from "@genie/core";
+import { NetworkName } from "@genieos/core";
 import { NetworkBalance } from "./tool-handler";
 
 export interface GetAddressToolInput extends ToolInput {

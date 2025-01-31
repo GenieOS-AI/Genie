@@ -1,4 +1,4 @@
-import { Tool, ToolConfig, IAgent, logger } from '@genie/core';
+import { Tool, ToolConfig, IAgent, logger } from '@genieos/core';
 import { GetTokenInfoToolOutput, GetTokenInfoToolInput, TokenQuery } from '../types';
 import { GetTokenInfoHandler } from '../handlers';
 import { TokenInfoHandlerRequest, TokenInfoHandlerResponse } from '../types/tool-handler';

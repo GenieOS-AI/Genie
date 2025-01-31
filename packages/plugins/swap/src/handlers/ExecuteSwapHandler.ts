@@ -1,4 +1,4 @@
-import { Handler, NetworkName } from "@genie/core";
+import { Handler, NetworkName } from "@genieos/core";
 import { QuoteStatus } from "../types/common";
 import { ExecuteSwapHandlerRequest, ExecuteSwapHandlerResponse } from "../types";
 import { ExecuteSwapTool } from "../tools/ExecuteSwapTool";

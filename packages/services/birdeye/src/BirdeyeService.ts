@@ -1,4 +1,4 @@
-import { Handler, IHandlerRequest, Service, ServiceMetadata, IHandlerResponse, NetworkName } from '@genie/core';
+import { Handler, IHandlerRequest, Service, ServiceMetadata, IHandlerResponse, NetworkName } from '@genieos/core';
 import packageJson from '../package.json';
 import { BirdeyeGetBalanceHandler } from './handlers/BirdeyeGetBalanceHandler';
 import { BirdeyeGetTokenInfoHandler } from './handlers/BirdeyeGetTokenInfoHandler';

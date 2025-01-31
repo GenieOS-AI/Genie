@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { NetworkName, ToolConfig, IAgent, Tool } from '@genie/core';
+import { NetworkName, ToolConfig, IAgent, Tool } from '@genieos/core';
 import { GetAddressToolInput, GetAddressToolOutput } from '../types/tool';
 
 export class GetWalletAddressTool extends Tool<GetAddressToolInput, GetAddressToolOutput, any> {
