@@ -1,6 +1,6 @@
 {
   "name": "@genieos/birdeye-service",
-  "version": "0.1.0",
+  "version": "0.0.2-alpha.0",
   "description": "Birdeye service for price and market data",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
