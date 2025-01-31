@@ -1,6 +1,5 @@
 {
   "name": "genieos",
-  "version": "0.0.4-alpha.0",
   "private": true,
   "workspaces": [
     "packages/*",
@@ -15,9 +14,9 @@
     "test": "pnpm -r --filter=@genieos/core test",
     "test:watch": "pnpm -r --filter=@genieos/core test:watch",
     "prepublishOnly": "pnpm run build",
-    "publish-packages": "lerna publish",
+    "publish-packages": "lerna publish from-package --yes",
     "validate-packages": "pnpm -r exec npm pack --dry-run",
-    "version": "lerna version"
+    "version": "lerna version --no-private --force-publish --yes --no-git-tag-version --no-push"
   },
   "dependencies": {
   },
