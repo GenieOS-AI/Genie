@@ -1,6 +1,6 @@
 {
   "name": "@genieos/example-plugin",
-  "version": "0.0.6-alpha.0",
+  "version": "0.0.7-alpha.0",
   "description": "Example plugins for Genie, including a weather plugin",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
