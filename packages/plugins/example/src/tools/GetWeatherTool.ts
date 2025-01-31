@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { IAgent, Tool } from '@genie/core';
+import { IAgent, Tool } from '@genieos/core';
 import { WeatherInput, WeatherOutput } from '../types';
 
 const weatherInputSchema = z.object({

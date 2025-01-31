@@ -1,6 +1,6 @@
-import { ModelProvider, NetworkManager, Wallet, NetworkName } from '@genie/core';
-import { GetWalletAddressTool, GetBalanceTool, WalletAgent, WalletPlugin } from '@genie/wallet-plugin';
-import { BirdeyeService } from '@genie/birdeye-service';
+import { ModelProvider, NetworkManager, Wallet, NetworkName } from '@genieos/core';
+import { GetWalletAddressTool, GetBalanceTool, WalletAgent, WalletPlugin } from '@genieos/wallet-plugin';
+import { BirdeyeService } from '@genieos/birdeye-service';
 
 async function main() {
   // Setup dependencies

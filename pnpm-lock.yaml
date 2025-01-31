@@ -14,25 +14,25 @@ importers:
 
   examples/basic-workflow:
     dependencies:
-      '@genie/birdeye-service':
+      '@genieos/birdeye-service':
         specifier: workspace:*
         version: link:../../packages/services/birdeye
-      '@genie/core':
+      '@genieos/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@genie/example-plugin':
+      '@genieos/example-plugin':
         specifier: workspace:*
         version: link:../../packages/plugins/example
-      '@genie/jupiter-service':
+      '@genieos/jupiter-service':
         specifier: workspace:*
         version: link:../../packages/services/jupiter
-      '@genie/swap-plugin':
+      '@genieos/swap-plugin':
         specifier: workspace:*
         version: link:../../packages/plugins/swap
-      '@genie/token-plugin':
+      '@genieos/token-plugin':
         specifier: workspace:*
         version: link:../../packages/plugins/token
-      '@genie/wallet-plugin':
+      '@genieos/wallet-plugin':
         specifier: workspace:*
         version: link:../../packages/plugins/wallet
       '@langchain/community':
@@ -139,7 +139,7 @@ importers:
 
   packages/plugins/example:
     dependencies:
-      '@genie/core':
+      '@genieos/core':
         specifier: workspace:*
         version: link:../../core
       zod:
@@ -155,10 +155,10 @@ importers:
 
   packages/plugins/swap:
     dependencies:
-      '@genie/core':
+      '@genieos/core':
         specifier: workspace:*
         version: link:../../core
-      '@genie/wallet-plugin':
+      '@genieos/wallet-plugin':
         specifier: workspace:*
         version: link:../wallet
       '@langchain/langgraph':
@@ -183,7 +183,7 @@ importers:
 
   packages/plugins/token:
     dependencies:
-      '@genie/core':
+      '@genieos/core':
         specifier: workspace:*
         version: link:../../core
       '@solana/web3.js':
@@ -205,7 +205,7 @@ importers:
 
   packages/plugins/wallet:
     dependencies:
-      '@genie/core':
+      '@genieos/core':
         specifier: workspace:*
         version: link:../../core
       '@solana/web3.js':
@@ -227,13 +227,13 @@ importers:
 
   packages/services/birdeye:
     dependencies:
-      '@genie/core':
+      '@genieos/core':
         specifier: workspace:*
         version: link:../../core
-      '@genie/token-plugin':
+      '@genieos/token-plugin':
         specifier: workspace:*
         version: link:../../plugins/token
-      '@genie/wallet-plugin':
+      '@genieos/wallet-plugin':
         specifier: workspace:*
         version: link:../../plugins/wallet
       axios:
@@ -267,10 +267,10 @@ importers:
 
   packages/services/jupiter:
     dependencies:
-      '@genie/core':
+      '@genieos/core':
         specifier: workspace:*
         version: link:../../core
-      '@genie/swap-plugin':
+      '@genieos/swap-plugin':
         specifier: workspace:*
         version: link:../../plugins/swap
       '@solana/spl-token':

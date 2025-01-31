@@ -1,4 +1,4 @@
-import { NetworkName, ToolInput, ToolOutput } from "@genie/core";
+import { NetworkName, ToolInput, ToolOutput } from "@genieos/core";
 import { SwapAmountType, TokenInfo, TokenAmount } from "./common";
 
 export interface SwapQuoteToolInput extends ToolInput {

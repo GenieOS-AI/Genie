@@ -1,4 +1,4 @@
-import { Handler, NetworkName } from "@genie/core";
+import { Handler, NetworkName } from "@genieos/core";
 import { GetBalanceHandlerRequest, GetBalanceHandlerResponse } from "../types/tool-handler";
 import { GetBalanceTool } from "../tools/GetBalanceTool";
 

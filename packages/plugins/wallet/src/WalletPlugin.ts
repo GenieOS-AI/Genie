@@ -1,4 +1,4 @@
-import { PluginMetadata, Plugin } from '@genie/core';
+import { PluginMetadata, Plugin } from '@genieos/core';
 import { GetWalletAddressTool, GetBalanceTool } from './tools';
 import packageJson from '../package.json';
 

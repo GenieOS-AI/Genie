@@ -10,7 +10,7 @@ import {
     JupiterError,
     TokenInfo
 } from './types';
-import { logger } from '@genie/core';
+import { logger } from '@genieos/core';
 
 export class JupiterAPI {
     private api: AxiosInstance;

@@ -1,4 +1,4 @@
-import { Plugin, PluginMetadata, IHandlerResponse, IHandlerRequest, IAgent, IHandler, IPlugin } from '@genie/core';
+import { Plugin, PluginMetadata, IHandlerResponse, IHandlerRequest, IAgent, IHandler, IPlugin } from '@genieos/core';
 import { GetSwapQuoteTool, ExecuteSwapTool } from './';
 import { SwapPluginOptions, SwapAmountType } from './types';
 import packageJson from '../package.json';

@@ -1,4 +1,4 @@
-import { Handler, NetworkName } from "@genie/core";
+import { Handler, NetworkName } from "@genieos/core";
 import { SwapQuoteHandlerRequest, SwapQuoteHandlerResponse } from "../types";
 import { GetSwapQuoteTool } from "../tools";
 

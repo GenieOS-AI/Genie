@@ -1,9 +1,9 @@
-import { ModelProvider, NetworkManager, Wallet, NetworkName, logger } from '@genie/core';
-import { SwapAgent, SwapPlugin, GetSwapQuoteTool, ExecuteSwapTool } from '@genie/swap-plugin';
-import { WalletPlugin } from '@genie/wallet-plugin';
-import { GetTokenInfoTool, TokenPlugin } from '@genie/token-plugin';
-import { JupiterService } from '@genie/jupiter-service';
-import { BirdeyeService } from '@genie/birdeye-service';
+import { ModelProvider, NetworkManager, Wallet, NetworkName, logger } from '@genieos/core';
+import { SwapAgent, SwapPlugin, GetSwapQuoteTool, ExecuteSwapTool } from '@genieos/swap-plugin';
+import { WalletPlugin } from '@genieos/wallet-plugin';
+import { GetTokenInfoTool, TokenPlugin } from '@genieos/token-plugin';
+import { JupiterService } from '@genieos/jupiter-service';
+import { BirdeyeService } from '@genieos/birdeye-service';
 import { HumanMessage } from '@langchain/core/messages';
 import { Command, MemorySaver } from "@langchain/langgraph";
 

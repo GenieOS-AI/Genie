@@ -1,4 +1,4 @@
-import { PluginOptions, ToolInput, ToolOutput } from "@genie/core";
+import { PluginOptions, ToolInput, ToolOutput } from "@genieos/core";
 
 export interface WeatherInput extends ToolInput {
   city: string;

@@ -1,6 +1,6 @@
 import { Connection } from '@solana/web3.js';
-import { Service, NetworkName, ServiceMetadata, IHandlerResponse, IHandlerRequest, Handler } from '@genie/core';
-import { SwapQuoteHandler, ExecuteSwapHandler } from '@genie/swap-plugin';
+import { Service, NetworkName, ServiceMetadata, IHandlerResponse, IHandlerRequest, Handler } from '@genieos/core';
+import { SwapQuoteHandler, ExecuteSwapHandler } from '@genieos/swap-plugin';
 import { JupiterAPI } from './JupiterAPI';
 import packageJson from '../package.json';
 import { JupiterExecuteHandler } from './handlers/JupiterExecuteHandler';

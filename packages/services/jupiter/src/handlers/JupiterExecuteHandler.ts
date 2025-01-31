@@ -1,6 +1,6 @@
 import { PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js';
-import { NetworkName } from '@genie/core';
-import { ExecuteSwapHandler, ExecuteSwapHandlerRequest, ExecuteSwapHandlerResponse, QuoteStatus } from '@genie/swap-plugin';
+import { NetworkName } from '@genieos/core';
+import { ExecuteSwapHandler, ExecuteSwapHandlerRequest, ExecuteSwapHandlerResponse, QuoteStatus } from '@genieos/swap-plugin';
 import { JupiterService } from '../JupiterService';
 import { JupiterAPI } from '../JupiterAPI';
 import { JupiterError, JupiterQuoteResponse } from '../types';

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Tool, ToolConfig, IAgent, logger } from '@genie/core';
+import { Tool, ToolConfig, IAgent, logger } from '@genieos/core';
 import { ExecuteSwapHandler } from '../handlers/ExecuteSwapHandler';
 import { ExecuteSwapToolInput, ExecuteSwapToolOutput } from '../types';
 
