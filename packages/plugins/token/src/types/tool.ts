@@ -1,4 +1,4 @@
-import { IHandlerResponse, NetworkName, TokenInfo, ToolInput, ToolOutput } from '@genie/core';
+import { IHandlerResponse, NetworkName, TokenInfo, ToolInput, ToolOutput } from '@genieos/core';
 
 export interface TokenQuery extends Record<string, unknown> {
   query: string;

@@ -1,6 +1,6 @@
-import { GetTokenInfoHandler, TokenInfoHandlerRequest, TokenInfoHandlerResponse } from "@genie/token-plugin";
-import { NetworkName } from "@genie/core";
-import { logger } from "@genie/core";
+import { GetTokenInfoHandler, TokenInfoHandlerRequest, TokenInfoHandlerResponse } from "@genieos/token-plugin";
+import { NetworkName } from "@genieos/core";
+import { logger } from "@genieos/core";
 import { BirdeyeAPI } from "../BirdeyeAPI";
 import { getBirdeyeSupportedNetworks, mapNetworkNameToBirdeye } from "../utils/networkMapping";
 import { SearchNetwork } from "../types/request";

@@ -1,6 +1,6 @@
-import { GetBalanceHandler, GetBalanceHandlerRequest, GetBalanceHandlerResponse } from "@genie/wallet-plugin";
-import { NetworkName } from "@genie/core";
-import { logger } from "@genie/core";
+import { GetBalanceHandler, GetBalanceHandlerRequest, GetBalanceHandlerResponse } from "@genieos/wallet-plugin";
+import { NetworkName } from "@genieos/core";
+import { logger } from "@genieos/core";
 import { BirdeyeAPI } from "../BirdeyeAPI";
 import { getBirdeyeSupportedNetworks, mapNetworkNameToBirdeye } from "../utils/networkMapping";
 

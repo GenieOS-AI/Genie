@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Tool, ToolConfig, IAgent, logger } from '@genie/core';
+import { Tool, ToolConfig, IAgent, logger } from '@genieos/core';
 import { SwapQuoteHandler } from '../handlers/SwapQuoteHandler';
 import { SwapQuoteToolInput, SwapQuoteToolOutput, SwapAmountType } from '../types';
 import { interrupt } from '@langchain/langgraph';

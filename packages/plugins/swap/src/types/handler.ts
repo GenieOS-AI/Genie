@@ -1,4 +1,4 @@
-import { NetworkName, IHandlerRequest, IHandlerResponse } from "@genie/core";
+import { NetworkName, IHandlerRequest, IHandlerResponse } from "@genieos/core";
 import { SwapAmountType, TokenInfo, TokenAmount } from "./common";
 
 

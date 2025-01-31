@@ -1,4 +1,4 @@
-import { NetworkName } from "@genie/core";
+import { NetworkName } from "@genieos/core";
 
 export interface SwapPluginOptions {
     defaultSlippage?: number;

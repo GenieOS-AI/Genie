@@ -1,5 +1,5 @@
-import { ModelProvider, NetworkManager, Wallet, NetworkName, Agent } from '@genie/core';
-import { GetWeatherTool, WeatherPlugin } from '@genie/example-plugin';
+import { ModelProvider, NetworkManager, Wallet, NetworkName, Agent } from '@genieos/core';
+import { GetWeatherTool, WeatherPlugin } from '@genieos/example-plugin';
 
 async function main() {
   // Setup dependencies

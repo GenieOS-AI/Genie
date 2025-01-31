@@ -1,19 +1,27 @@
 {
-  "name": "@genie/example-plugin",
-  "version": "1.0.0",
+  "name": "@genieos/example-plugin",
+  "version": "0.0.5-alpha.0",
   "description": "Example plugins for Genie, including a weather plugin",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "test": "jest"
   },
   "dependencies": {
-    "@genie/core": "workspace:*",
+    "@genieos/core": "workspace:*",
     "zod": "^3.24.1"
   },
   "devDependencies": {
-  "typescript": "^5.7.3",
-  "@types/node": "^20.17.12"
+    "@types/node": "^20.17.12",
+    "typescript": "^5.7.3"
   }
-} 
+}

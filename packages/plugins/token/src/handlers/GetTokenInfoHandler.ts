@@ -1,4 +1,4 @@
-import { Handler, NetworkName } from '@genie/core';
+import { Handler, NetworkName } from '@genieos/core';
 import { TokenInfoHandlerRequest, TokenInfoHandlerResponse } from '../types';
 import { GetTokenInfoTool } from '../tools/GetTokenInfoTool';
 

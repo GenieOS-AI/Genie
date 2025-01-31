@@ -1,6 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
-import { logger, NetworkName } from '@genie/core';
-import { SwapQuoteHandler, SwapQuoteHandlerRequest, SwapQuoteHandlerResponse } from '@genie/swap-plugin';
+import { logger, NetworkName } from '@genieos/core';
+import { SwapQuoteHandler, SwapQuoteHandlerRequest, SwapQuoteHandlerResponse } from '@genieos/swap-plugin';
 import { JupiterService } from '../JupiterService';
 import { generateQuoteId } from '../utils';
 import { JupiterAPI } from '../JupiterAPI';

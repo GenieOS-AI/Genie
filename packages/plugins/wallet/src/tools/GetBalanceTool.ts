@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Tool, ToolConfig, IAgent } from '@genie/core';
+import { Tool, ToolConfig, IAgent } from '@genieos/core';
 import { GetBalanceHandler } from '../handlers';
 import { GetBalanceHandlerRequest, GetBalanceToolInput, GetBalanceToolOutput, NetworkBalance } from '../types';
 

@@ -1,4 +1,4 @@
-import { IHandlerResponse, NetworkName, TokenInfo } from '@genie/core';
+import { IHandlerResponse, NetworkName, TokenInfo } from '@genieos/core';
 
 export interface TokenInfoHandlerRequest {
   [key: string]: unknown;

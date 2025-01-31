@@ -1,4 +1,4 @@
-import { AgentDependencies, ModelProvider, ModelConfig, Agent, IService, IPlugin } from '@genie/core';
+import { AgentDependencies, ModelProvider, ModelConfig, Agent, IService, IPlugin } from '@genieos/core';
 
 export class WalletAgent extends Agent {
   constructor(config: {

@@ -1,6 +1,6 @@
-import { NetworkName } from "@genie/core";
+import { NetworkName } from "@genieos/core";
 
-import { IHandlerRequest, IHandlerResponse } from "@genie/core";
+import { IHandlerRequest, IHandlerResponse } from "@genieos/core";
 
 export interface GetBalanceHandlerRequest extends IHandlerRequest {
     address: string;
