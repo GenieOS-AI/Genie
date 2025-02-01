@@ -1,6 +1,19 @@
 import { config, DotenvConfigOutput } from 'dotenv';
-import { existsSync } from 'fs';
-import { join } from 'path';
+
+// Dynamic imports for Node.js environment
+const isNode = typeof process !== 'undefined' && 
+  process.versions != null && 
+  process.versions.node != null;
+
+// Import Node.js modules synchronously when in Node environment
+let fs: any;
+let path: any;
+
+if (isNode) {
+  // Synchronous requires for Node.js environment
+  fs = require('fs');
+  path = require('path');
+}
 
 export class EnvironmentManager {
   private envStore: Map<string, string>;
@@ -19,45 +32,55 @@ export class EnvironmentManager {
   }
 
   private loadFromFile(filePath: string): void {
-    if (existsSync(filePath)) {
-      const result: DotenvConfigOutput = config({ path: filePath });
-      if (result.error) {
-        console.error(`Error loading ${filePath}:`, result.error);
-        return;
+    if (!isNode) return; // Skip file operations in browser
+
+    try {
+      if (fs.existsSync(filePath)) {
+        const result: DotenvConfigOutput = config({ path: filePath });
+        if (result.error) {
+          console.error(`Error loading ${filePath}:`, result.error);
+          return;
+        }
+        if (result.parsed) {
+          Object.entries(result.parsed).forEach(([key, value]) => {
+            if (typeof value === 'string') {
+              this.envStore.set(key, value);
+            }
+          });
+        }
       }
-      if (result.parsed) {
-        Object.entries(result.parsed).forEach(([key, value]) => {
-          if (typeof value === 'string') {
-            this.envStore.set(key, value);
-          }
-        });
-      }
+    } catch (error) {
+      console.error(`Error checking/loading ${filePath}:`, error);
     }
   }
 
   private loadFromProcessEnv(): void {
-    Object.entries(process.env).forEach(([key, value]) => {
-      if (typeof value === 'string') {
-        this.envStore.set(key, value);
-      }
-    });
+    if (typeof process !== 'undefined' && process.env) {
+      Object.entries(process.env).forEach(([key, value]) => {
+        if (typeof value === 'string') {
+          this.envStore.set(key, value);
+        }
+      });
+    }
   }
 
   private loadEnvironment(): void {
-    // Load files in order (later files override earlier ones)
-    const envFiles = [
-      '.env.local',        // lowest priority
-      '.env.development',
-      '.env',
-      '.env.production',    // highest priority
-      '.env.test'          // for testing purposes
-    ];
+    if (isNode) {
+      // Load files in order (later files override earlier ones)
+      const envFiles = [
+        '.env.local',        // lowest priority
+        '.env.development',
+        '.env',
+        '.env.production',   // highest priority
+        '.env.test'          // for testing purposes
+      ];
 
-    // Load each file in order with absolute paths
-    envFiles.forEach(file => {
-      const absolutePath = join(process.cwd(), file);
-      this.loadFromFile(absolutePath);
-    });
+      // Load each file in order with absolute paths
+      for (const file of envFiles) {
+        const absolutePath = path.join(process.cwd(), file);
+        this.loadFromFile(absolutePath);
+      }
+    }
 
     // Finally, load from process.env (highest priority)
     this.loadFromProcessEnv();
