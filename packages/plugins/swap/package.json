@@ -1,6 +1,6 @@
 {
   "name": "@genieos/swap-plugin",
-  "version": "0.0.7-alpha.3",
+  "version": "0.0.7-alpha.4",
   "description": "Token swap plugin for Genie",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
