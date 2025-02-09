@@ -9,7 +9,7 @@ import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts
 import { IHandler, IHandlerRequest } from '../services/types/handler';
 import { IHandlerResponse } from '../services/types/handler';
 import { AgentPluginConfig, IPlugin } from './types';
-import { findServiceConfig, findPluginConfig, getModelApiKey, getModelSettings } from '../utils/agent';
+import { findServiceConfig, findPluginConfig, getModelSettings } from '../utils/agent';
 import { IService } from '../services/types/service';
 import { logger } from '../utils';
 import { Annotation, Command, CompiledStateGraph, END, interrupt, START, StateGraph } from '@langchain/langgraph';
@@ -133,7 +133,7 @@ export class Agent implements IAgent {
 
   private initializeModel(modelConfig: ModelConfig): void {
     logger.info(`Initializing model: ${this.model.config.model}`);
-    const apiKey = getModelApiKey(modelConfig, this.model.provider);
+    const apiKey = modelConfig.apiKey;
     const settings = getModelSettings(modelConfig, this.model.config.settings);
 
     this.context.model = new ChatOpenAI({
@@ -242,7 +242,7 @@ export class Agent implements IAgent {
 
       await dispatchCustomEvent("review_transaction_data", { chunk: {content: lastMessage.content.toString()} });
 
-      const apiKey = getModelApiKey(this.model.config, this.model.provider);
+      const apiKey = this.model.config.apiKey;
       const settings = getModelSettings(this.model.config, this.model.config.settings);
 
       const reviewModel = new ChatOpenAI({

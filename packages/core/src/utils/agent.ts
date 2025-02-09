@@ -15,20 +15,6 @@ export function findPluginConfig(pluginName: string, pluginConfig?: AgentPluginC
   );
   return pluginEntry ? pluginEntry[pluginName] : undefined;
 }
-
-export function getModelApiKey(modelConfig: ModelConfig, provider: string): string | undefined {
-  if (!modelConfig.apiKeyEnvVarName) return undefined;
-  
-  const apiKey = env.get(modelConfig.apiKeyEnvVarName);
-  if (!apiKey) {
-    throw new Error(
-      `API key not found in environment for provider ${provider} (${modelConfig.apiKeyEnvVarName})`
-    );
-  }
-  
-  return apiKey;
-}
-
 export function getModelSettings(modelConfig: ModelConfig, configSettings: any) {
   return {
     temperature: modelConfig.settings?.temperature,
