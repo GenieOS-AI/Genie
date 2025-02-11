@@ -2,6 +2,7 @@ export interface ModelSettings {
     temperature?: number;
     maxTokens?: number;
     topP?: number;
+    topK?: number;
     frequencyPenalty?: number;
     presencePenalty?: number;
     verbose?: boolean;
@@ -11,6 +12,8 @@ export interface ModelSettings {
     OPENAI = 'openai',
     ANTHROPIC = 'anthropic',
     GOOGLE = 'google',
+    DEEPSEEK = 'deepseek',
+    CUSTOM = 'custom',
   } 
 
 
