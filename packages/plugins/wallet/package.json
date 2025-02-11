@@ -1,6 +1,6 @@
 {
   "name": "@genieos/wallet-plugin",
-  "version": "0.0.7-alpha.5",
+  "version": "0.0.7-alpha.6",
   "description": "Wallet plugin for Genie",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
