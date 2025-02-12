@@ -132,13 +132,13 @@ export class Agent implements IAgent {
   }
 
   private initializeModel(modelConfig: ModelConfig): void {
-    logger.info(`Initializing model: ${this.model.config.model}`);
+    logger.info(`Initializing model: ${modelConfig.model}`);
     const apiKey = modelConfig.apiKey;
-    const settings = getModelSettings(modelConfig, this.model.config.settings);
+    const settings = getModelSettings(modelConfig, modelConfig.settings);
 
     this.context.model = new ChatOpenAI({
       ...(apiKey && { openAIApiKey: apiKey }),
-      modelName: this.model.config.model,
+      modelName: modelConfig.model,
       ...settings
     });
     logger.debug('Model initialized successfully');
@@ -323,7 +323,7 @@ export class Agent implements IAgent {
       logger.debug(`Initialized ${this.plugins.length} plugins`);
 
       // Initialize model
-      const modelConfig = getModelConfig(this.model.provider);
+      const modelConfig = this.model.config;
       this.initializeModel(modelConfig);
 
       // Initialize agent with tools
