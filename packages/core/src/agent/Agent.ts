@@ -240,7 +240,7 @@ export class Agent implements IAgent {
         text?: string;
       };
 
-      await dispatchCustomEvent("review_transaction_data", { chunk: {content: lastMessage.content.toString()} });
+      await dispatchCustomEvent("review_transaction_data", { chunk: {content: lastMessage.content.toString(), name: lastMessage.name} });
 
       const apiKey = this.model.config.apiKey;
       const settings = getModelSettings(this.model.config, this.model.config.settings);
@@ -259,7 +259,7 @@ export class Agent implements IAgent {
 
       for await (const chunk of responseReview) {
         reviewQuestion += chunk.content.toString();
-        await dispatchCustomEvent("review_transaction_text", { chunk });
+        await dispatchCustomEvent("review_transaction_text", { chunk: {content: chunk.content.toString(), name: lastMessage.name} });
       }
 
       const humanReview = interrupt<HumanReviewInput, HumanReviewOutput>({
