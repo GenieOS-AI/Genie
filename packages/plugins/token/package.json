@@ -1,6 +1,6 @@
 {
   "name": "@genieos/token-plugin",
-  "version": "0.0.7-alpha.10",
+  "version": "0.0.7-alpha.11",
   "description": "Token plugin for Genie",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
