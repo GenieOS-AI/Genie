@@ -240,7 +240,7 @@ export class Agent implements IAgent {
         text?: string;
       };
 
-      await dispatchCustomEvent("review_transaction_data", { chunk: {content: lastMessage.content.toString(), name: lastMessage.name} });
+      await dispatchCustomEvent("review_transaction_data", { chunk: {content: JSON.stringify(JSON.parse(lastMessage.content.toString()).data), name: lastMessage.name} });
 
       const apiKey = this.model.config.apiKey;
       const settings = getModelSettings(this.model.config, this.model.config.settings);
