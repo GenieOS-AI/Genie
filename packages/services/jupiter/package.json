@@ -1,6 +1,6 @@
 {
   "name": "@genieos/jupiter-service",
-  "version": "0.0.7-alpha.8",
+  "version": "0.0.7-alpha.9",
   "description": "Jupiter DEX aggregator service for Genie",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
