@@ -4,7 +4,7 @@ import { WalletPlugin } from '@genieos/wallet-plugin';
 import { GetTokenInfoTool, TokenPlugin } from '@genieos/token-plugin';
 import { JupiterService } from '@genieos/jupiter-service';
 import { BirdeyeService } from '@genieos/birdeye-service';
-import { HumanMessage } from '@langchain/core/messages';
+import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { Command, MemorySaver } from "@langchain/langgraph";
 
 
@@ -53,6 +53,7 @@ async function main() {
     model: {
       config: {
         model: process.env.OPENAI_MODEL || 'gpt-4-turbo-preview',
+        apiKey: process.env.OPENAI_API_KEY || '',
       },
       provider: ModelProvider.OPENAI,
     },
@@ -66,10 +67,10 @@ async function main() {
       new TokenPlugin(),
       new WalletPlugin() // Required by SwapPlugin
     ],
-   checkpoint: new MemorySaver(),
+    checkpoint: new MemorySaver(),
     services: [new JupiterService({
-        rpcUrl: network.getNetworkConfig(NetworkName.SOLANA).config.rpcUrl,
-        cluster: 'mainnet-beta'
+      rpcUrl: network.getNetworkConfig(NetworkName.SOLANA).config.rpcUrl,
+      cluster: 'mainnet-beta'
     }), new BirdeyeService(process.env.BIRDEYE_API_KEY || '')],
     systemMessage: "Only support networks: " + networkSupported.join(', ') + ". CRITERIAL: Swap token need token address. If you swap token with symbol, you must use the get token info tool to get the token address.",
   }, dependencies);
@@ -120,7 +121,7 @@ async function main() {
     // const quoteInfo = await swapAgent.execute(
     //   'Swapping 0.1 ETH to USDC on Ethereum'
     // ); 
-    
+
     // const quoteInfo = await swapAgent.execute(
     //   {
     //     messages: [
@@ -129,10 +130,12 @@ async function main() {
     //   }
     // );
 
-    for await (const chunk of await swapAgent.execute(
+    let needReview = false;
+
+    for await (const { event, tags, data, name } of await swapAgent.execute(
       {
         messages: [
-          new HumanMessage('Swapping 0.001 SOL to USDC on Solana')
+          new HumanMessage('Swapping 0.1 SOL to USDC on Solana')
         ]
       },
       {
@@ -140,21 +143,62 @@ async function main() {
         user_id: "456"
       }
     )) {
-      // logger.info(chunk);
-   }
+      if (event === "on_custom_event" && name === "final_message") {
+        if (data.chunk.content) {
+          // Empty content in the context of OpenAI or Anthropic usually means
+          // that the model is asking for a tool to be invoked.
+          // So we only print non-empty content
+          console.log(data.chunk.content);
+        }
+      }
 
-   logger.info("I waitting the user to approve the swap ----> ");
+      if (event === "on_custom_event" && name === "review_transaction_text") {
+        if (data.chunk.content) {
+          // Empty content in the context of OpenAI or Anthropic usually means
+          // that the model is asking for a tool to be invoked.
+          // So we only print non-empty content
+          console.log(data.chunk.content);
+          needReview = true;
+        }
+      }
 
-   for await (const chunk of await swapAgent.execute(
-    new Command({ resume: { text: "I approve the swap" } }), 
-    {
-      thread_id: "123",
-      user_id: "456"
+      if (event === "on_custom_event" && name === "review_transaction_data") {
+        if (data.chunk.content) {
+          // Empty content in the context of OpenAI or Anthropic usually means
+          // that the model is asking for a tool to be invoked.
+          // So we only print non-empty content
+          console.log(JSON.parse(data.chunk.content.toString()));
+          needReview = true;
+        }
+      }
+      // logger.info("event: ", event);
+      // logger.info("event: ", event);
+      // logger.info("tags: ", tags);
+      // logger.info("data: ", data);
     }
- )) {
-    // logger.info(chunk);
- }
-   
+
+    if (needReview) {
+      logger.info("I waitting the user to approve the swap ----> ");
+
+      for await (const { event, tags, data, name } of await swapAgent.execute(
+        new Command({ resume: { text: "I approve the swap" } }),
+        {
+          thread_id: "123",
+          user_id: "456"
+        }
+      )) {
+        if (event === "on_custom_event" && name === "final_message") {
+          if (data.chunk.content) {
+            // Empty content in the context of OpenAI or Anthropic usually means
+            // that the model is asking for a tool to be invoked.
+            // So we only print non-empty content
+            console.log(data.chunk.content);
+          }
+        }
+        // logger.info(chunk);
+      }
+    }
+
   } catch (error) {
     logger.error('Error during execution:', error);
     process.exit(1);

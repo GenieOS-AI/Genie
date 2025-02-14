@@ -45,6 +45,7 @@ async function main() {
     model: {
       config: {
         model: process.env.OPENAI_MODEL || 'gpt-4-turbo-preview',
+        apiKey: process.env.OPENAI_API_KEY || '',
       },
       provider: ModelProvider.OPENAI,
     },
